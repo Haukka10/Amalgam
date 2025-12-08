@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e6140038c46aa04f9f0d3e898f4879f, type: 3}
+  m_Name: TextCard 3
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardName: Test4
+  domain: 2
+  cardType: 0
+  basePower: 5
+  artwork: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  description: This crad is for debug and testing
+  abilityGraph: {fileID: 0}

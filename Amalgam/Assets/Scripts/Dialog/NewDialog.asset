@@ -1,0 +1,201 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3724c2de3c0348942b024765bcf69aae, type: 3}
+  m_Name: NewDialog
+  m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  dialogNodes:
+  - nodeID: 60263b02-e7e5-4fae-b0de-64059a21a417
+    npcName: NPC
+    dialogText: StartPoint
+    options:
+    - optionText: Option 1 StartPoint
+      nextNode:
+        nodeID: 852f2950-4bff-4bf1-b077-df874b9a252b
+        npcName: NPC
+        dialogText: 2 Dialog
+        options:
+        - optionText: Option 1  Dialog2
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 719, y: 264}
+        position: {x: 519, y: 162}
+        isEntryNode: 0
+      connectionPoint: {x: 359, y: 308}
+    - optionText: Option 2 StartPoint
+      nextNode:
+        nodeID: ef78bde7-a962-40e6-bbf8-0122d52b6250
+        npcName: NPC
+        dialogText: Option 2
+        options:
+        - optionText: Option 1 Dialog 3
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 715, y: 417}
+        position: {x: 515, y: 315}
+        isEntryNode: 0
+      connectionPoint: {x: 359, y: 333}
+    - optionText: Option 3 StartPoint
+      nextNode:
+        nodeID: 9559711c-035c-4c4f-a714-e88cd220b979
+        npcName: NPC
+        dialogText: Option 4
+        options:
+        - optionText: Option 1 Dialog 4
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 717, y: 571}
+        position: {x: 517, y: 469}
+        isEntryNode: 0
+      connectionPoint: {x: 359, y: 358}
+    - optionText: Option  4 StartPoint
+      nextNode:
+        nodeID: 
+        npcName: 
+        dialogText: 
+        options: []
+        position: {x: 0, y: 0}
+        isEntryNode: 0
+      connectionPoint: {x: 359, y: 383}
+    position: {x: 159, y: 206}
+    isEntryNode: 0
+  - nodeID: 852f2950-4bff-4bf1-b077-df874b9a252b
+    npcName: NPC
+    dialogText: 2 Dialog
+    options:
+    - optionText: Option 1  Dialog2
+      nextNode:
+        nodeID: 
+        npcName: 
+        dialogText: 
+        options: []
+        position: {x: 0, y: 0}
+        isEntryNode: 0
+      connectionPoint: {x: 719, y: 264}
+    position: {x: 519, y: 162}
+    isEntryNode: 0
+  - nodeID: ef78bde7-a962-40e6-bbf8-0122d52b6250
+    npcName: NPC
+    dialogText: Option 2
+    options:
+    - optionText: Option 1 Dialog 3
+      nextNode:
+        nodeID: 
+        npcName: 
+        dialogText: 
+        options: []
+        position: {x: 0, y: 0}
+        isEntryNode: 0
+      connectionPoint: {x: 715, y: 417}
+    position: {x: 515, y: 315}
+    isEntryNode: 0
+  - nodeID: 9559711c-035c-4c4f-a714-e88cd220b979
+    npcName: NPC
+    dialogText: Option 4
+    options:
+    - optionText: Option 1 Dialog 4
+      nextNode:
+        nodeID: 
+        npcName: 
+        dialogText: 
+        options: []
+        position: {x: 0, y: 0}
+        isEntryNode: 0
+      connectionPoint: {x: 717, y: 571}
+    position: {x: 517, y: 469}
+    isEntryNode: 0
+  entryNode:
+    nodeID: 60263b02-e7e5-4fae-b0de-64059a21a417
+    npcName: NPC
+    dialogText: StartPoint
+    options:
+    - optionText: Option 1
+      nextNode:
+        nodeID: 852f2950-4bff-4bf1-b077-df874b9a252b
+        npcName: NPC
+        dialogText: Option 1
+        options:
+        - optionText: Option 1
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 687, y: 276}
+        position: {x: 487, y: 174}
+        isEntryNode: 0
+      connectionPoint: {x: 350, y: 323}
+    - optionText: Option 2
+      nextNode:
+        nodeID: ef78bde7-a962-40e6-bbf8-0122d52b6250
+        npcName: NPC
+        dialogText: Option 2
+        options:
+        - optionText: Option 1
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 670, y: 433}
+        position: {x: 470, y: 331}
+        isEntryNode: 0
+      connectionPoint: {x: 350, y: 348}
+    - optionText: Option 3
+      nextNode:
+        nodeID: 9559711c-035c-4c4f-a714-e88cd220b979
+        npcName: NPC
+        dialogText: Option 4
+        options:
+        - optionText: Option 1
+          nextNode:
+            nodeID: 
+            npcName: 
+            dialogText: 
+            options: []
+            position: {x: 0, y: 0}
+            isEntryNode: 0
+          connectionPoint: {x: 689, y: 572}
+        position: {x: 489, y: 470}
+        isEntryNode: 0
+      connectionPoint: {x: 350, y: 373}
+    - optionText: Option 4
+      nextNode:
+        nodeID: 
+        npcName: 
+        dialogText: 
+        options: []
+        position: {x: 0, y: 0}
+        isEntryNode: 0
+      connectionPoint: {x: 350, y: 398}
+    position: {x: 150, y: 221}
+    isEntryNode: 0
+  editorOffset: {x: 0, y: 0}
+  editorZoom: 1

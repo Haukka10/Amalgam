@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 02ddbca8f00eee64193e496dbadfa73e
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Anchorpoint plugin for Unity
+  packageVersion: 1.0.4
+  assetPath: Packages/com.anchorpoint.sourcecontrol/LICENSE.md
+  uploadId: 806170

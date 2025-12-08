@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4f713c0c84d38d549bc3be157e825f1a
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Anchorpoint plugin for Unity
+  packageVersion: 1.0.4
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Third Party Notices.md
+  uploadId: 806170

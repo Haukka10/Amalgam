@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c89533914438767429cea23a8435310a
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Anchorpoint plugin for Unity
+  packageVersion: 1.0.4
+  assetPath: Packages/com.anchorpoint.sourcecontrol/CHANGELOG.md
+  uploadId: 806170
