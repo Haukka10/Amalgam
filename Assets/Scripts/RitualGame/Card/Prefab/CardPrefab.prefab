@@ -150,6 +150,8 @@ GameObject:
   - component: {fileID: 1712386464665066742}
   - component: {fileID: 3143140162965517405}
   - component: {fileID: 9220725973158920114}
+  - component: {fileID: 1285615404515936806}
+  - component: {fileID: 3256599165504980026}
   m_Layer: 5
   m_Name: CardPrefab
   m_TagString: Untagged
@@ -275,6 +277,36 @@ MonoBehaviour:
   powerText: {fileID: 0}
   nameText: {fileID: 0}
   cardBack: {fileID: 0}
+--- !u!114 &1285615404515936806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971449750488496080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e741851cba3ad425c91ecf922cc6b379, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualScripting.Core::Unity.VisualScripting.Variables
+  _data:
+    _json: '{"declarations":{"Kind":"Object","collection":{"$content":[],"$version":"A"},"$version":"A"}}'
+    _objectReferences: []
+--- !u!114 &3256599165504980026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2971449750488496080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2fe5546f775c47d2820aa5e8a715f53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualScripting.Flow::Unity.VisualScripting.ScriptMachine
+  _data:
+    _json: '{"nest":{"source":"Macro","macro":null,"embed":null}}'
+    _objectReferences: []
 --- !u!1 &5868658638957955789
 GameObject:
   m_ObjectHideFlags: 0
