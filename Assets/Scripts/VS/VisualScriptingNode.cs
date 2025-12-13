@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 using Unity.VisualScripting;
 
 using CardGame.CardObj;
@@ -8,6 +9,9 @@ using CardGame.Manager.Main;
 using System.Collections.Generic;
 
 using static CardGame.Structures.Structures;
+using CardGame.Board.Slot;
+using CardGame.Manager.Battlefield;
+
 
 [UnitTitle("Apply Power Modifier")]
 [UnitCategory("Rytuały/Card Effects")]
@@ -77,7 +81,7 @@ public class DrawCardNode : Unit
             CardDomain dom = flow.GetValue<CardDomain>(domain);
 
             // Znajdź DeckManager gracza
-            DeckManager deck = Object.FindObjectOfType<DeckManager>();
+            DeckManager deck = Object.FindAnyObjectByType<DeckManager>();
             Card card = deck?.DrawCardFromDomain(dom);
 
             flow.SetValue(drawnCard, card);
@@ -93,223 +97,214 @@ public class DrawCardNode : Unit
     }
 }
 
-// ============================================
-// NOWE CUSTOM NODES DLA BATTLEFIELD I RĘKI
-// ============================================
-
-[UnitTitle("Get Player Hand")]
-[UnitCategory("Rytuały/Game Info")]
-public class GetPlayerHandNode : Unit
+// Node 1: Count Cards In Valhalla
+[UnitTitle("Count Cards In Valhalla")]
+[UnitCategory("Rytuały/Advanced")]
+public class CountCardsInValhallaNode : Unit
 {
-    [DoNotSerialize] public ValueOutput hand;
+    [DoNotSerialize] public ValueInput cardNameInput;
+    [DoNotSerialize] public ValueOutput countOutput;
 
     protected override void Definition()
     {
-        hand = ValueOutput<List<Card>>(nameof(hand), (flow) =>
+        cardNameInput = ValueInput<string>(nameof(cardNameInput), "");
+
+        countOutput = ValueOutput<int>(nameof(countOutput), (flow) =>
         {
-            return RitualGameManager.Instance?.GetPlayerHand();
-        });
-    }
-}
+            string name = flow.GetValue<string>(cardNameInput);
 
-[UnitTitle("Get Enemy Hand")]
-[UnitCategory("Rytuały/Game Info")]
-public class GetEnemyHandNode : Unit
-{
-    [DoNotSerialize] public ValueOutput hand;
+            BattlefieldManager bf = RitualGameManager.Instance?.battlefield;
+            if (bf == null) return 0;
 
-    protected override void Definition()
-    {
-        hand = ValueOutput<List<Card>>(nameof(hand), (flow) =>
-        {
-            return RitualGameManager.Instance?.GetEnemyHand();
-        });
-    }
-}
-
-[UnitTitle("Get Battlefield Card")]
-[UnitCategory("Rytuały/Game Info")]
-public class GetBattlefieldCardNode : Unit
-{
-    [DoNotSerialize] public ValueOutput card;
-
-    protected override void Definition()
-    {
-        card = ValueOutput<Card>(nameof(card), (flow) =>
-        {
-            return RitualGameManager.Instance?.GetBattlefieldCard();
-        });
-    }
-}
-
-[UnitTitle("Get Player Lane")]
-[UnitCategory("Rytuały/Game Info")]
-public class GetPlayerLaneNode : Unit
-{
-    [DoNotSerialize] public ValueOutput lane;
-
-    protected override void Definition()
-    {
-        lane = ValueOutput<PlayerLane>(nameof(lane), (flow) =>
-        {
-            return RitualGameManager.Instance?.GetPlayerLane();
-        });
-    }
-}
-
-[UnitTitle("Get Enemy Lane")]
-[UnitCategory("Rytuały/Game Info")]
-public class GetEnemyLaneNode : Unit
-{
-    [DoNotSerialize] public ValueOutput lane;
-
-    protected override void Definition()
-    {
-        lane = ValueOutput<PlayerLane>(nameof(lane), (flow) =>
-        {
-            return RitualGameManager.Instance?.GetEnemyLane();
-        });
-    }
-}
-
-[UnitTitle("Get Card From Slot")]
-[UnitCategory("Rytuały/Lane")]
-public class GetCardFromSlotNode : Unit
-{
-    [DoNotSerialize] public ValueInput lane;
-    [DoNotSerialize] public ValueInput slotType;
-    [DoNotSerialize] public ValueOutput card;
-
-    protected override void Definition()
-    {
-        lane = ValueInput<PlayerLane>(nameof(lane), null);
-        slotType = ValueInput<SlotType>(nameof(slotType), SlotType.BACK);
-
-        card = ValueOutput<Card>(nameof(card), (flow) =>
-        {
-            PlayerLane playerLane = flow.GetValue<PlayerLane>(lane);
-            SlotType slot = flow.GetValue<SlotType>(slotType);
-
-            if (playerLane == null) return null;
-
-            switch (slot)
+            int c = 0;
+            foreach (Transform child in bf.valhallaTransform)
             {
-                case SlotType.BACK: return playerLane.backSlot.currentCard;
-                case SlotType.MID: return playerLane.midSlot.currentCard;
-                case SlotType.FRONT: return playerLane.frontSlot.currentCard;
-                default: return null;
-            }
-        });
-    }
-}
-
-[UnitTitle("Destroy Card In Hand")]
-[UnitCategory("Rytuały/Hand Effects")]
-public class DestroyCardInHandNode : Unit
-{
-    [DoNotSerialize] public ControlInput inputTrigger;
-    [DoNotSerialize] public ControlOutput outputTrigger;
-
-    [DoNotSerialize] public ValueInput targetCard;
-    [DoNotSerialize] public ValueInput isPlayerHand;
-
-    protected override void Definition()
-    {
-        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
-        {
-            Card card = flow.GetValue<Card>(targetCard);
-            bool playerHand = flow.GetValue<bool>(isPlayerHand);
-
-            if (card != null && RitualGameManager.Instance != null)
-            {
-                DeckManager deck = playerHand ?
-                    RitualGameManager.Instance.playerDeck :
-                    RitualGameManager.Instance.aiDeck;
-
-                deck.RemoveFromHand(card);
-                Object.Destroy(card.gameObject);
+                Card card = child.GetComponent<Card>();
+                if (card != null && card.data.cardName == name)
+                {
+                    c++;
+                }
             }
 
-            return outputTrigger;
+            return c;
         });
-
-        outputTrigger = ControlOutput(nameof(outputTrigger));
-        targetCard = ValueInput<Card>(nameof(targetCard), null);
-        isPlayerHand = ValueInput<bool>(nameof(isPlayerHand), true);
-
-        Succession(inputTrigger, outputTrigger);
     }
 }
 
-[UnitTitle("Get Random Card From Hand")]
-[UnitCategory("Rytuały/Hand Effects")]
-public class GetRandomCardFromHandNode : Unit
+// Node 2: Return Card To Slot
+[UnitTitle("Return Card To Slot")]
+[UnitCategory("Rytuały/Advanced")]
+public class ReturnCardToSlotNode : Unit
 {
-    [DoNotSerialize] public ValueInput isPlayerHand;
-    [DoNotSerialize] public ValueOutput randomCard;
+    [DoNotSerialize] public ControlInput returnTrigger;
+    [DoNotSerialize] public ControlOutput returnOutput;
+
+    [DoNotSerialize] public ValueInput cardInput;
+    [DoNotSerialize] public ValueInput slotTypeReturn;
 
     protected override void Definition()
     {
-        isPlayerHand = ValueInput<bool>(nameof(isPlayerHand), true);
-
-        randomCard = ValueOutput<Card>(nameof(randomCard), (flow) =>
+        returnTrigger = ControlInput(nameof(returnTrigger), (flow) =>
         {
-            bool playerHand = flow.GetValue<bool>(isPlayerHand);
+            Card c = flow.GetValue<Card>(cardInput);
+            SlotType slot = flow.GetValue<SlotType>(slotTypeReturn);
 
-            List<Card> hand = playerHand ?
-                RitualGameManager.Instance?.GetPlayerHand() :
-                RitualGameManager.Instance?.GetEnemyHand();
-
-            if (hand != null && hand.Count > 0)
+            if (c != null && RitualGameManager.Instance != null)
             {
-                return hand[UnityEngine.Random.Range(0, hand.Count)];
+                PlayerLane lane = c.owner == Player.Human ?
+                    RitualGameManager.Instance.playerLane :
+                    RitualGameManager.Instance.aiLane;
+
+                BoardSlot targetSlot = GetSlotByType(lane, slot);
+
+                if (targetSlot != null && targetSlot.currentCard == null)
+                {
+                    targetSlot.PlaceCard(c);
+                }
             }
 
-            return null;
+            return returnOutput;
+        });
+
+        returnOutput = ControlOutput(nameof(returnOutput));
+        cardInput = ValueInput<Card>(nameof(cardInput), null);
+        slotTypeReturn = ValueInput<SlotType>(nameof(slotTypeReturn), SlotType.BACK);
+
+        Succession(returnTrigger, returnOutput);
+    }
+
+    BoardSlot GetSlotByType(PlayerLane lane, SlotType type)
+    {
+        switch (type)
+        {
+            case SlotType.BACK: return lane.backSlot;
+            case SlotType.MID: return lane.midSlot;
+            case SlotType.FRONT: return lane.frontSlot;
+            default: return null;
+        }
+    }
+}
+
+// Node 3: Destroy Card
+[UnitTitle("Destroy Card")]
+[UnitCategory("Rytuały/Advanced")]
+public class DestroyCardNode : Unit
+{
+    [DoNotSerialize] public ControlInput destroyCardTrigger;
+    [DoNotSerialize] public ControlOutput destroyCardOutput;
+
+    [DoNotSerialize] public ValueInput cardToDestroy;
+
+    protected override void Definition()
+    {
+        destroyCardTrigger = ControlInput(nameof(destroyCardTrigger), (flow) =>
+        {
+            Card c = flow.GetValue<Card>(cardToDestroy);
+
+            if (c != null)
+            {
+                Object.Destroy(c.gameObject);
+            }
+
+            return destroyCardOutput;
+        });
+
+        destroyCardOutput = ControlOutput(nameof(destroyCardOutput));
+        cardToDestroy = ValueInput<Card>(nameof(cardToDestroy), null);
+
+        Succession(destroyCardTrigger, destroyCardOutput);
+    }
+}
+
+// Node 4: Set Game Variable
+[UnitTitle("Set Game Variable")]
+[UnitCategory("Rytuały/Variables")]
+public class SetGameVariableNode : Unit
+{
+    [DoNotSerialize] public ControlInput setVarTrigger;
+    [DoNotSerialize] public ControlOutput setVarOutput;
+
+    [DoNotSerialize] public ValueInput varName;
+    [DoNotSerialize] public ValueInput varValue;
+
+    protected override void Definition()
+    {
+        setVarTrigger = ControlInput(nameof(setVarTrigger), (flow) =>
+        {
+            string name = flow.GetValue<string>(varName);
+            object val = flow.GetValue<object>(varValue);
+
+            if (RitualGameManager.Instance != null)
+            {
+                if (!RitualGameManager.Instance.gameVariables.ContainsKey(name))
+                {
+                    RitualGameManager.Instance.gameVariables.Add(name, val);
+                }
+                else
+                {
+                    RitualGameManager.Instance.gameVariables[name] = val;
+                }
+            }
+
+            return setVarOutput;
+        });
+
+        setVarOutput = ControlOutput(nameof(setVarOutput));
+        varName = ValueInput<string>(nameof(varName), "");
+        varValue = ValueInput<object>(nameof(varValue), null);
+
+        Succession(setVarTrigger, setVarOutput);
+    }
+}
+
+// Node 5: Get Game Variable
+[UnitTitle("Get Game Variable")]
+[UnitCategory("Rytuały/Variables")]
+public class GetGameVariableNode : Unit
+{
+    [DoNotSerialize] public ValueInput getVarName;
+    [DoNotSerialize] public ValueInput defaultVal;
+    [DoNotSerialize] public ValueOutput varOutput;
+
+    protected override void Definition()
+    {
+        getVarName = ValueInput<string>(nameof(getVarName), "");
+        defaultVal = ValueInput<object>(nameof(defaultVal), null);
+
+        varOutput = ValueOutput<object>(nameof(varOutput), (flow) =>
+        {
+            string name = flow.GetValue<string>(getVarName);
+            object defVal = flow.GetValue<object>(defaultVal);
+
+            if (RitualGameManager.Instance != null &&
+                RitualGameManager.Instance.gameVariables.ContainsKey(name))
+            {
+                return RitualGameManager.Instance.gameVariables[name];
+            }
+
+            return defVal;
         });
     }
 }
 
-[UnitTitle("Get Hand Size")]
+// Node 6: Find Card In Hand By Domain
+[UnitTitle("Find Card In Hand By Domain")]
 [UnitCategory("Rytuały/Hand Effects")]
-public class GetHandSizeNode : Unit
+public class FindCardInHandByDomainNode : Unit
 {
-    [DoNotSerialize] public ValueInput isPlayerHand;
-    [DoNotSerialize] public ValueOutput size;
+    [DoNotSerialize] public ValueInput domainInput;
+    [DoNotSerialize] public ValueInput isPlayerHandFind;
+    [DoNotSerialize] public ValueOutput foundCardOutput;
 
     protected override void Definition()
     {
-        isPlayerHand = ValueInput<bool>(nameof(isPlayerHand), true);
+        domainInput = ValueInput<CardDomain>(nameof(domainInput), CardDomain.K);
+        isPlayerHandFind = ValueInput<bool>(nameof(isPlayerHandFind), false);
 
-        size = ValueOutput<int>(nameof(size), (flow) =>
+        foundCardOutput = ValueOutput<Card>(nameof(foundCardOutput), (flow) =>
         {
-            bool playerHand = flow.GetValue<bool>(isPlayerHand);
-
-            List<Card> hand = playerHand ?
-                RitualGameManager.Instance?.GetPlayerHand() :
-                RitualGameManager.Instance?.GetEnemyHand();
-
-            return hand?.Count ?? 0;
-        });
-    }
-}
-
-[UnitTitle("Affect All Cards In Hand")]
-[UnitCategory("Rytuały/Hand Effects")]
-public class AffectAllCardsInHandNode : Unit
-{
-    [DoNotSerialize] public ControlInput inputTrigger;
-    [DoNotSerialize] public ControlOutput outputTrigger;
-
-    [DoNotSerialize] public ValueInput isPlayerHand;
-    [DoNotSerialize] public ValueInput powerChange;
-
-    protected override void Definition()
-    {
-        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
-        {
-            bool playerHand = flow.GetValue<bool>(isPlayerHand);
-            int power = flow.GetValue<int>(powerChange);
+            CardDomain dom = flow.GetValue<CardDomain>(domainInput);
+            bool playerHand = flow.GetValue<bool>(isPlayerHandFind);
 
             List<Card> hand = playerHand ?
                 RitualGameManager.Instance?.GetPlayerHand() :
@@ -319,35 +314,278 @@ public class AffectAllCardsInHandNode : Unit
             {
                 foreach (Card card in hand)
                 {
-                    card.ApplyModifier(power);
+                    if (card.data.domain == dom)
+                    {
+                        return card;
+                    }
                 }
+            }
+
+            return null;
+        });
+    }
+}
+
+// Node 7: Show Card Info UI
+[UnitTitle("Show Card Info UI")]
+[UnitCategory("Rytuały/UI")]
+public class ShowCardInfoUINode : Unit
+{
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
+    [DoNotSerialize] public ValueInput card;
+    [DoNotSerialize] public ValueInput message;
+
+    protected override void Definition()
+    {
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
+        {
+            Card c = flow.GetValue<Card>(card);
+            string msg = flow.GetValue<string>(message);
+
+            if (c != null)
+            {
+                // Show UI popup with card info
+                Debug.Log($"{msg}: {c.data.cardName} (Power: {c.currentPower}, Domain: {c.data.domain})");
+
+                // TODO: Create actual UI popup
             }
 
             return outputTrigger;
         });
 
         outputTrigger = ControlOutput(nameof(outputTrigger));
-        isPlayerHand = ValueInput<bool>(nameof(isPlayerHand), true);
-        powerChange = ValueInput<int>(nameof(powerChange), 0);
+        card = ValueInput<Card>(nameof(card), null);
+        message = ValueInput<string>(nameof(message), "Revealed Card");
 
         Succession(inputTrigger, outputTrigger);
     }
 }
 
-[UnitTitle("Get Effective Power")]
-[UnitCategory("Rytuały/Card Info")]
-public class GetEffectivePowerNode : Unit
+// Node 8: Transform Card Data
+[UnitTitle("Transform Card")]
+[UnitCategory("Rytuały/Advanced")]
+public class TransformCardNode : Unit
 {
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
     [DoNotSerialize] public ValueInput card;
-    [DoNotSerialize] public ValueOutput power;
+    [DoNotSerialize] public ValueInput newName;
+    [DoNotSerialize] public ValueInput newPower;
 
     protected override void Definition()
     {
-        card = ValueInput<Card>(nameof(card), null);
-        power = ValueOutput<int>(nameof(power), (flow) =>
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
         {
             Card c = flow.GetValue<Card>(card);
-            return c != null ? c.GetEffectivePower() : 0;
+            string name = flow.GetValue<string>(newName);
+            int power = flow.GetValue<int>(newPower);
+
+            if (c != null)
+            {
+                // Create new CardData (or modify existing)
+                c.currentPower = power;
+                c.UpdateVisuals();
+
+                // For name change, would need to create new CardData
+                Debug.Log($"Card transformed to: {name} with power {power}");
+            }
+
+            return outputTrigger;
+        });
+
+        outputTrigger = ControlOutput(nameof(outputTrigger));
+        card = ValueInput<Card>(nameof(card), null);
+        newName = ValueInput<string>(nameof(newName), "");
+        newPower = ValueInput<int>(nameof(newPower), 0);
+
+        Succession(inputTrigger, outputTrigger);
+    }
+}
+
+// Node 9: Get Opposite MOD Slot
+[UnitTitle("Get Opposite MOD Slot")]
+[UnitCategory("Rytuały/Lane")]
+public class GetOppositeMODSlotNode : Unit
+{
+    [DoNotSerialize] public ValueInput mySlot;
+    [DoNotSerialize] public ValueOutput oppositeSlot;
+
+    protected override void Definition()
+    {
+        mySlot = ValueInput<BoardSlot>(nameof(mySlot), null);
+
+        oppositeSlot = ValueOutput<BoardSlot>(nameof(oppositeSlot), (flow) =>
+        {
+            BoardSlot slot = flow.GetValue<BoardSlot>(mySlot);
+
+            if (slot == null || RitualGameManager.Instance == null) return null;
+
+            // Determine which lane this slot belongs to
+            PlayerLane myLane = slot.owner == Player.Human ?
+                RitualGameManager.Instance.playerLane :
+                RitualGameManager.Instance.aiLane;
+
+            PlayerLane oppositeLane = slot.owner == Player.Human ?
+                RitualGameManager.Instance.aiLane :
+                RitualGameManager.Instance.playerLane;
+
+            // Find which MOD slot (1 or 2)
+            if (slot == myLane.modSlot1)
+            {
+                return oppositeLane.modSlot1;
+            }
+            else if (slot == myLane.modSlot2)
+            {
+                return oppositeLane.modSlot2;
+            }
+
+            return null;
+        });
+    }
+}
+
+// Node 10: Copy Card Ability
+[UnitTitle("Copy Card Ability")]
+[UnitCategory("Rytuały/Advanced")]
+public class CopyCardAbilityNode : Unit
+{
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
+    [DoNotSerialize] public ValueInput sourceCard;
+    [DoNotSerialize] public ValueInput targetCard;
+
+    protected override void Definition()
+    {
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
+        {
+            Card source = flow.GetValue<Card>(sourceCard);
+            Card target = flow.GetValue<Card>(targetCard);
+
+            if (source != null && target != null && source.data.abilityGraph != null)
+            {
+                // Copy ability graph reference
+                target.data.abilityGraph = source.data.abilityGraph;
+
+                // Copy any variables (like usesRemaining)
+                // This is simplified - you'd need proper variable copying
+                Debug.Log($"Copied ability from {source.data.cardName} to {target.data.cardName}");
+            }
+
+            return outputTrigger;
+        });
+
+        outputTrigger = ControlOutput(nameof(outputTrigger));
+        sourceCard = ValueInput<Card>(nameof(sourceCard), null);
+        targetCard = ValueInput<Card>(nameof(targetCard), null);
+
+        Succession(inputTrigger, outputTrigger);
+    }
+}
+
+// Node 11: Set All Cards Face Down
+[UnitTitle("Set All Cards Face Down")]
+[UnitCategory("Rytuały/Board")]
+public class SetAllCardsFaceDownNode : Unit
+{
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
+    [DoNotSerialize] public ValueInput faceDown;
+
+    protected override void Definition()
+    {
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
+        {
+            bool hidden = flow.GetValue<bool>(faceDown);
+
+            if (RitualGameManager.Instance != null)
+            {
+                // Set all cards on both lanes
+                SetLaneCardsFaceDown(RitualGameManager.Instance.playerLane, hidden);
+                SetLaneCardsFaceDown(RitualGameManager.Instance.aiLane, hidden);
+            }
+
+            return outputTrigger;
+        });
+
+        outputTrigger = ControlOutput(nameof(outputTrigger));
+        faceDown = ValueInput<bool>(nameof(faceDown), true);
+
+        Succession(inputTrigger, outputTrigger);
+    }
+
+    void SetLaneCardsFaceDown(PlayerLane lane, bool hidden)
+    {
+        if (lane.backSlot.currentCard != null)
+            lane.backSlot.currentCard.SetHidden(hidden);
+        if (lane.midSlot.currentCard != null)
+            lane.midSlot.currentCard.SetHidden(hidden);
+        if (lane.frontSlot.currentCard != null)
+            lane.frontSlot.currentCard.SetHidden(hidden);
+    }
+}
+
+// Node 12: Flip Power Sign
+[UnitTitle("Flip Power Sign")]
+[UnitCategory("Rytuały/Card Effects")]
+public class FlipPowerSignNode : Unit
+{
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
+    [DoNotSerialize] public ValueInput card;
+
+    protected override void Definition()
+    {
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
+        {
+            Card c = flow.GetValue<Card>(card);
+
+            if (c != null)
+            {
+                int currentPower = c.currentPower;
+                int newPower = -currentPower;
+                int difference = newPower - currentPower;
+
+                c.ApplyModifier(difference);
+
+                Debug.Log($"Flipped {c.data.cardName} power from {currentPower} to {newPower}");
+            }
+
+            return outputTrigger;
+        });
+
+        outputTrigger = ControlOutput(nameof(outputTrigger));
+        card = ValueInput<Card>(nameof(card), null);
+
+        Succession(inputTrigger, outputTrigger);
+    }
+}
+
+// Node 13: Check If Slot Type
+[UnitTitle("Check If Slot Type")]
+[UnitCategory("Rytuały/Lane")]
+public class CheckIfSlotTypeNode : Unit
+{
+    [DoNotSerialize] public ValueInput slot;
+    [DoNotSerialize] public ValueInput slotType;
+    [DoNotSerialize] public ValueOutput isMatch;
+
+    protected override void Definition()
+    {
+        slot = ValueInput<BoardSlot>(nameof(slot), null);
+        slotType = ValueInput<SlotType>(nameof(slotType), SlotType.BACK);
+
+        isMatch = ValueOutput<bool>(nameof(isMatch), (flow) =>
+        {
+            BoardSlot s = flow.GetValue<BoardSlot>(slot);
+            SlotType type = flow.GetValue<SlotType>(slotType);
+
+            return s != null && s.slotType == type;
         });
     }
 }

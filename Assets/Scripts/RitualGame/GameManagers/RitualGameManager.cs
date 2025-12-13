@@ -11,6 +11,7 @@ using CardGame.Manager.Deck;
 using CardGame.Manager.Battlefield;
 
 using static CardGame.Structures.Structures;
+using System.Linq;
 
 namespace CardGame.Manager.Main
 {
@@ -32,7 +33,9 @@ namespace CardGame.Manager.Main
 
         private Card selectedCard;
         private bool playerTurn = true;
+
         public GameState currentState = GameState.PlayerTurn;
+        public Dictionary<string, object> gameVariables = new Dictionary<string, object>();
 
         public enum GameState { PlayerTurn, AITurn, Battle, GameEnd }
 
@@ -102,9 +105,77 @@ namespace CardGame.Manager.Main
 
         void EndPlayerTurn()
         {
+            ProcessTurnEffects();
             currentState = GameState.AITurn;
             UpdateUI();
             Invoke(nameof(ExecuteAITurn), 1f);
+        }
+
+        void ProcessTurnEffects()
+        {
+            // Sprawdź wszystkie karty z timerem
+            List<string> keysToProcess = new List<string>();
+
+            foreach (var kvp in gameVariables.ToList())
+            {
+                if (kvp.Key.Contains("TurnsLeft") && kvp.Value is int)
+                {
+                    int turns = (int)kvp.Value;
+                    turns--;
+                    gameVariables[kvp.Key] = turns;
+
+                    if (turns <= 0)
+                    {
+                        keysToProcess.Add(kvp.Key);
+                    }
+                }
+            }
+
+            // Trigger delayed effects
+            foreach (string key in keysToProcess)
+            {
+                TriggerDelayedEffect(key);
+                gameVariables.Remove(key);
+            }
+        }
+
+        void TriggerDelayedEffect(string variableKey)
+        {
+            Debug.Log($"Triggered delayed effect: {variableKey}");
+
+            // Custom event for cards with delayed effects
+            // Cards listening for this can react
+
+            // Example: Darkness effect ending
+            if (variableKey == "darknessTurnsLeft")
+            {
+                SetGameVariable("allCardsFaceDown", false);
+                RevealAllCards();
+            }
+        }
+
+        void RevealAllCards()
+        {
+            RevealLaneCards(playerLane);
+            RevealLaneCards(aiLane);
+        }
+
+        void RevealLaneCards(PlayerLane lane)
+        {
+            if (lane.backSlot.currentCard != null)
+            {
+                lane.backSlot.currentCard.SetHidden(false);
+            }
+
+            if (lane.midSlot.currentCard != null)
+            {
+                lane.midSlot.currentCard.SetHidden(false);
+            }
+
+            if (lane.frontSlot.currentCard != null)
+            {
+                lane.frontSlot.currentCard.SetHidden(false);
+            }
         }
 
         void ExecuteAITurn()
@@ -164,6 +235,21 @@ namespace CardGame.Manager.Main
             turnText.text = currentState == GameState.PlayerTurn ? "Your turn" : "Enemy turn";
             moveButton.interactable = currentState == GameState.PlayerTurn;
             passButton.interactable = currentState == GameState.PlayerTurn;
+        }
+
+        public void SetGameVariable(string name, object value)
+        {
+            if (gameVariables.ContainsKey(name))
+                gameVariables[name] = value;
+            else
+                gameVariables.Add(name, value);
+        }
+
+        public object GetGameVariable(string name, object defaultValue = null)
+        {
+            if (gameVariables.ContainsKey(name))
+                return gameVariables[name];
+            return defaultValue;
         }
 
         // Publiczne metody do użycia w Visual Scripting
