@@ -96,7 +96,7 @@ namespace CardGame.CardObj
             currentPower += powerChange;
             UpdateVisuals();
         }
-
+        
         // Zwraca prawdziwą moc karty (z bonusem +1 jeśli jest na BACK)
         public int GetEffectivePower()
         {
