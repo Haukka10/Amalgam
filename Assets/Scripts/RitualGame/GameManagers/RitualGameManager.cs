@@ -12,6 +12,7 @@ using CardGame.Manager.Battlefield;
 
 using static CardGame.Structures.Structures;
 using System.Linq;
+using System;
 
 namespace CardGame.Manager.Main
 {
@@ -137,6 +138,31 @@ namespace CardGame.Manager.Main
                 TriggerDelayedEffect(key);
                 gameVariables.Remove(key);
             }
+            BroadcastTurnEndEvent();
+        }
+
+        void BroadcastTurnEndEvent()
+        {
+            BroadcastToLane(playerLane);
+            BroadcastToLane(aiLane);
+        }
+
+        void BroadcastToLane(PlayerLane lane)
+        {
+            if (lane.backSlot.currentCard != null)
+                lane.backSlot.currentCard.TriggerAbility("OnTurnEnd", null);
+
+            if (lane.midSlot.currentCard != null)
+                lane.midSlot.currentCard.TriggerAbility("OnTurnEnd", null);
+
+            if (lane.frontSlot.currentCard != null)
+                lane.frontSlot.currentCard.TriggerAbility("OnTurnEnd", null);
+
+            if (lane.modSlot1.currentCard != null)
+                lane.modSlot1.currentCard.TriggerAbility("OnTurnEnd", null);
+
+            if (lane.modSlot2.currentCard != null)
+                lane.modSlot2.currentCard.TriggerAbility("OnTurnEnd", null);
         }
 
         void TriggerDelayedEffect(string variableKey)

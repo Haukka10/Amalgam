@@ -19,6 +19,9 @@ namespace CardGame.CardObj
         public Text powerText;
         public Text nameText;
         public Image cardBack;
+
+        public ScriptMachine scriptMachine;
+
         private CanvasGroup canvasGroup;
 
         void Awake()
@@ -34,7 +37,28 @@ namespace CardGame.CardObj
             data = cardData;
             owner = cardOwner;
             currentPower = data.basePower;
+
+            if (data.abilityGraph != null)
+            {
+                SetupScriptMachine();
+            }
+
             UpdateVisuals();
+        }
+
+        void SetupScriptMachine()
+        {
+            ScriptMachine machine = GetComponent<ScriptMachine>();
+
+            if (machine == null)
+            {
+                machine = gameObject.AddComponent<ScriptMachine>();
+            }
+
+            machine.nest.source = GraphSource.Macro;
+            machine.nest.macro = data.abilityGraph;
+
+            Debug.Log($"Script Machine setup for {data.cardName} with graph {data.abilityGraph.name}");
         }
 
         public void UpdateVisuals()
