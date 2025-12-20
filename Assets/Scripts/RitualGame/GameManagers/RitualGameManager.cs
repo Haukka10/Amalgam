@@ -13,9 +13,21 @@ using CardGame.Manager.Battlefield;
 using static CardGame.Structures.Structures;
 using System.Linq;
 using System;
+using Unity.Collections;
 
 namespace CardGame.Manager.Main
 {
+    public enum WhoWin : int
+    {
+        Player = 0,
+        AI = 1
+    }
+
+    public enum TypeBattle : int
+    {
+        Heal = 0,
+        Destroy = 1
+    }
     public class RitualGameManager : MonoBehaviour
     {
         public static RitualGameManager Instance;
@@ -32,6 +44,19 @@ namespace CardGame.Manager.Main
         public Button passButton;
         public TextMeshProUGUI turnText;
 
+        [Header("Stats Of Game")]
+        public TextMeshProUGUI BilarHPText;
+        public int MaxBilarHP;
+        [ReadOnly]
+        public WhoWin WhoWin;
+        public TypeBattle TypeBattle;
+
+        public bool allCardsFaceDown;
+
+        [HideInInspector]
+        public int currentBilarHP;
+
+        private int turnCount;
         private Card selectedCard;
         private bool playerTurn = true;
 
@@ -50,7 +75,19 @@ namespace CardGame.Manager.Main
             moveButton.onClick.AddListener(OnMoveButtonClicked);
             passButton.onClick.AddListener(OnPassButtonClicked);
 
+            SetType();
+            if(TypeBattle == TypeBattle.Destroy)
+                currentBilarHP = MaxBilarHP;
+
+            BilarHPText.text = currentBilarHP.ToString();
+
             UpdateUI();
+        }
+
+        public void SetType()
+        {
+            var r = UnityEngine.Random.Range(0, 1);
+            TypeBattle = (TypeBattle)r;
         }
 
         public void OnCardClicked(Card card)
@@ -59,6 +96,10 @@ namespace CardGame.Manager.Main
             if (card.owner != Player.Human) return;
 
             selectedCard = card;
+
+            if (TypeBattle == TypeBattle.Destroy)
+                selectedCard.SwapEffectivePower();
+
             HighlightValidSlots(card);
         }
 
@@ -72,11 +113,11 @@ namespace CardGame.Manager.Main
 
         public void PlayCardOnSlot(Card card, BoardSlot slot)
         {
-            // Zagraj kartę
+            
             playerDeck.RemoveFromHand(card);
             slot.PlaceCard(card);
 
-            // Dobierz nową kartę z tej samej domeny
+            
             playerDeck.DrawCardFromDomain(card.data.domain);
 
             ClearHighlights();
@@ -86,11 +127,9 @@ namespace CardGame.Manager.Main
         public void OnDomainPileClicked(CardDomain domain)
         {
             if (currentState != GameState.PlayerTurn) return;
-
-            // Opcjonalnie: dobierz dodatkową kartę z kupki
+            //TODO
             Debug.Log($"Kliknięto kupkę domeny: {domain}");
 
-            // Można tu dodać specjalną mechanikę, np. podgląd kupki
         }
 
         void OnMoveButtonClicked()
@@ -114,7 +153,6 @@ namespace CardGame.Manager.Main
 
         void ProcessTurnEffects()
         {
-            // Sprawdź wszystkie karty z timerem
             List<string> keysToProcess = new List<string>();
 
             foreach (var kvp in gameVariables.ToList())
@@ -163,6 +201,14 @@ namespace CardGame.Manager.Main
 
             if (lane.modSlot2.currentCard != null)
                 lane.modSlot2.currentCard.TriggerAbility("OnTurnEnd", null);
+
+            if (allCardsFaceDown)
+            {
+                foreach(var la in lane.slots)
+                {
+                    la.currentCard.SetHidden(true);
+                }
+            }
         }
 
         void TriggerDelayedEffect(string variableKey)
@@ -206,7 +252,6 @@ namespace CardGame.Manager.Main
 
         void ExecuteAITurn()
         {
-            // Użyj zaawansowanego AI
             AdvancedAI ai = GetComponent<AdvancedAI>();
             if (ai == null)
             {
@@ -231,10 +276,30 @@ namespace CardGame.Manager.Main
                 battlefield.ResolveBattle(playerCard, aiCard);
             }
 
-            // Powrót do tury gracza
             currentState = GameState.PlayerTurn;
             playerTurn = true;
             UpdateUI();
+        }
+
+        //TODO
+        public void CheckForEndGame()
+        {
+            if(TypeBattle == TypeBattle.Heal)
+            {
+                if(currentBilarHP == MaxBilarHP)
+                {
+                    Debug.Log("Win in Heal mode");
+                    currentState = GameState.GameEnd;
+                }
+            }
+            else
+            {
+                if(currentBilarHP <= 0)
+                {
+                    Debug.Log("Win in Destroy mode");
+                    currentState = GameState.GameEnd;
+                }
+            }
         }
 
         public void HighlightValidSlots(Card card)
@@ -261,6 +326,8 @@ namespace CardGame.Manager.Main
             turnText.text = currentState == GameState.PlayerTurn ? "Your turn" : "Enemy turn";
             moveButton.interactable = currentState == GameState.PlayerTurn;
             passButton.interactable = currentState == GameState.PlayerTurn;
+
+            BilarHPText.text = currentBilarHP.ToString();
         }
 
         public void SetGameVariable(string name, object value)

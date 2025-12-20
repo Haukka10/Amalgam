@@ -135,5 +135,7 @@ namespace CardGame.CardObj
 
             return power;
         }
+
+        public void SwapEffectivePower() => currentPower *= -1;
     }
 }

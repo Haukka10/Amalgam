@@ -15,7 +15,7 @@ MonoBehaviour:
   cardName: Test2
   domain: 2
   cardType: 0
-  basePower: 5
-  artwork: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  basePower: 10
+  artwork: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
   description: This crad is for debug and testing
   abilityGraph: {fileID: 0}

@@ -119,6 +119,41 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &12207853
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 12207854}
+  m_Layer: 5
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &12207854
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 12207853}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 281674298}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 68.424, y: 0}
+  m_SizeDelta: {x: 66.306, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &18271060
 GameObject:
   m_ObjectHideFlags: 0
@@ -210,7 +245,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00103, y: 413}
+  m_AnchoredPosition: {x: -2.0010436, y: 363.00003}
   m_SizeDelta: {x: 680.13, y: 186.6616}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &45407761
@@ -231,6 +266,7 @@ MonoBehaviour:
   midSlot: {fileID: 8705515144153164126}
   modSlot2: {fileID: 5613814287004346171}
   frontSlot: {fileID: 6184163609442526223}
+  slots: []
 --- !u!114 &45407762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,7 +517,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1.9997034, y: -262.89}
+  m_AnchoredPosition: {x: 3.999717, y: -312.88998}
   m_SizeDelta: {x: 800.92, y: 143.02}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &240614485
@@ -500,9 +536,9 @@ MonoBehaviour:
   domainK_Pile:
   - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
   domainP_Pile:
-  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
+  - {fileID: 11400000, guid: 69ebf9c6643d8e848949d47ec8ecf3cc, type: 2}
   domainM_Pile:
-  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
+  - {fileID: 11400000, guid: 69ebf9c6643d8e848949d47ec8ecf3cc, type: 2}
   domainD_Pile:
   - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
   handTransform: {fileID: 987309305}
@@ -800,11 +836,13 @@ RectTransform:
   - {fileID: 1927724497}
   - {fileID: 1114261944}
   - {fileID: 2002063612}
+  - {fileID: 1575640391}
+  - {fileID: 12207854}
   m_Father: {fileID: 2041828943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 2, y: 149}
+  m_AnchoredPosition: {x: 4, y: 99}
   m_SizeDelta: {x: 550.9206, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &281674299
@@ -857,9 +895,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fabb59243ff65d047b6da0a465968fb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardGame.Manager.Battlefield.BattlefieldManager
-  battlefieldSlot: {fileID: 0}
-  valhallaTransform: {fileID: 0}
-  graveyardTransform: {fileID: 0}
+  battlefieldSlot: {fileID: 2133364762}
+  valhallaTransform: {fileID: 2002063612}
+  graveyardTransform: {fileID: 1114261944}
+  playerBattlePosition: {fileID: 1575640391}
+  aiBattlePosition: {fileID: 12207854}
+  cardDisplayTime: 2
+  resultDisplayTime: 1.5
 --- !u!1 &499793263
 GameObject:
   m_ObjectHideFlags: 0
@@ -1186,7 +1228,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 599}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &555139399
@@ -2921,10 +2963,11 @@ MonoBehaviour:
   aiLane: {fileID: 45407761}
   playerDeck: {fileID: 240614485}
   aiDeck: {fileID: 1581590087}
-  battlefield: {fileID: 0}
+  battlefield: {fileID: 281674301}
   moveButton: {fileID: 779081673}
   passButton: {fileID: 805993161}
   turnText: {fileID: 833192215}
+  allCardsFaceDown: 0
   currentState: 0
 --- !u!4 &1068147566
 Transform:
@@ -3019,7 +3062,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 60cf827689d18cb4b8d3f247f42555ad, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000076294
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 60cf827689d18cb4b8d3f247f42555ad, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3158,7 +3201,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000022888, y: -91}
+  m_AnchoredPosition: {x: 1.9999907, y: -140.99998}
   m_SizeDelta: {x: 680.1362, y: 163.9646}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1212693711
@@ -3179,6 +3222,7 @@ MonoBehaviour:
   midSlot: {fileID: 7762710851156627289}
   modSlot2: {fileID: 8697824125764427874}
   frontSlot: {fileID: 1101643718735237072}
+  slots: []
 --- !u!114 &1212693712
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3610,6 +3654,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1495936148}
   m_CullTransparentMesh: 1
+--- !u!1 &1575640390
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1575640391}
+  m_Layer: 5
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1575640391
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575640390}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 281674298}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -66.847015, y: 0}
+  m_SizeDelta: {x: 66.306, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1578911048
 GameObject:
   m_ObjectHideFlags: 0
@@ -3796,12 +3875,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardGame.Manager.Deck.DeckManager
   owner: 1
-  domainK_Pile: []
-  domainP_Pile: []
-  domainM_Pile: []
-  domainD_Pile: []
+  domainK_Pile:
+  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
+  domainP_Pile:
+  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
+  domainM_Pile:
+  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
+  domainD_Pile:
+  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
   handTransform: {fileID: 540753418}
-  cardPrefab: {fileID: 0}
+  cardPrefab: {fileID: 2971449750488496080, guid: 9d822bf132963f540a2f946c3606b631, type: 3}
   pileK_Transform: {fileID: 0}
   pileP_Transform: {fileID: 0}
   pileM_Transform: {fileID: 0}
@@ -3841,7 +3924,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -12.317, y: -370}
+  m_AnchoredPosition: {x: -14, y: -434.4}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1592852890
@@ -4712,7 +4795,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 636d671b87386c44086445859128db86, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 110
+      value: 203.1538
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 636d671b87386c44086445859128db86, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4854,7 +4937,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 1c2cab9fa22f86341945247bd9ad160d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000076294
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1439217787037538029, guid: 1c2cab9fa22f86341945247bd9ad160d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -5055,6 +5138,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2133364762 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8405336729722159783, guid: 636d671b87386c44086445859128db86, type: 3}
+  m_PrefabInstance: {fileID: 1927724496}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548ad411bc3521141a91a6e0744cf495, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardGame.Board.Slot.BoardSlot
 --- !u!114 &126716051424913298 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8135700768719240428, guid: 56137e60e8dfa4a4dbd401730520ac5f, type: 3}
@@ -6134,7 +6228,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1852447386275658929, guid: 1ec29f1f50a7c524b94938f1c78afda8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 246.301
+      value: 250.30103
       objectReference: {fileID: 0}
     - target: {fileID: 1852447386275658929, guid: 1ec29f1f50a7c524b94938f1c78afda8, type: 3}
       propertyPath: m_AnchoredPosition.y

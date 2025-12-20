@@ -15,7 +15,8 @@ namespace CardGame.Board.Lane
         public BoardSlot modSlot2;
         public BoardSlot frontSlot;
 
-        private List<BoardSlot> slots;
+        [HideInInspector]
+        public List<BoardSlot> slots;
 
         void Awake()
         {

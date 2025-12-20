@@ -1,4 +1,5 @@
 ﻿using CardGame.CardObj;
+using CardGame.Manager.Main;
 using UnityEngine;
 using UnityEngine.UI;
 using static CardGame.Structures.Structures;
