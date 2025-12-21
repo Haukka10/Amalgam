@@ -27,13 +27,13 @@ namespace CardGame.AI
 
             var hand = aiDeck.GetHand();
 
-            // Znajdź najlepszą kartę do zagrania
             Card bestCard = null;
             BoardSlot bestSlot = null;
             int bestScore = -1;
 
             foreach (Card card in hand)
             {
+                
                 BoardSlot targetSlot = GetBestSlotForCard(card);
                 if (targetSlot != null)
                 {
@@ -47,7 +47,6 @@ namespace CardGame.AI
                 }
             }
 
-            // Zagraj najlepszą kartę
             if (bestCard != null && bestSlot != null)
             {
                 aiDeck.RemoveFromHand(bestCard);
@@ -55,7 +54,6 @@ namespace CardGame.AI
                 aiDeck.DrawCardFromDomain(bestCard.data.domain);
             }
 
-            // Zdecyduj czy przesunąć karty
             if (ShouldMoveCards())
             {
                 aiLane.MoveCardsForward();
@@ -88,11 +86,9 @@ namespace CardGame.AI
         {
             int score = card.currentPower;
 
-            // Preferuj MOD karty
             if (card.data.cardType == CardType.Modifier)
                 score += 5;
 
-            // Preferuj BACK slot
             if (slot.slotType == SlotType.BACK)
                 score += 3;
 

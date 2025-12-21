@@ -1,8 +1,7 @@
-﻿using CardGame.CardObj;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
+using CardGame.CardObj;
 using UnityEngine.UI;
-using static CardGame.Structures.Structures;
+using UnityEngine;
 
 namespace CardGame.Manager.Deck
 {
@@ -28,7 +27,6 @@ namespace CardGame.Manager.Deck
 
         private List<Card> hand = new List<Card>();
         private Dictionary<CardDomain, List<CardData>> domainPiles = new Dictionary<CardDomain, List<CardData>>();
-        private Dictionary<CardDomain, int> domainIndices = new Dictionary<CardDomain, int>();
 
         void Start()
         {
@@ -39,22 +37,14 @@ namespace CardGame.Manager.Deck
 
         void InitializeDeck()
         {
-            // Przypisz kupki do słownika
             domainPiles[CardDomain.K] = new List<CardData>(domainK_Pile);
             domainPiles[CardDomain.P] = new List<CardData>(domainP_Pile);
             domainPiles[CardDomain.M] = new List<CardData>(domainM_Pile);
             domainPiles[CardDomain.D] = new List<CardData>(domainD_Pile);
-
-            // Inicjalizuj indeksy dla każdej domeny
-            foreach (CardDomain domain in System.Enum.GetValues(typeof(CardDomain)))
-            {
-                domainIndices[domain] = 0;
-            }
         }
 
         public void DrawInitialHand()
         {
-            // Dobierz po 1 karcie z każdej domeny (K, P, M, D)
             foreach (CardDomain domain in System.Enum.GetValues(typeof(CardDomain)))
             {
                 DrawCardFromDomain(domain);
@@ -69,12 +59,11 @@ namespace CardGame.Manager.Deck
                 return null;
             }
 
-            // Pobierz następną kartę z kupki (cyklicznie)
-            int index = domainIndices[domain] % domainPiles[domain].Count;
+            int index = 0;
             CardData cardData = domainPiles[domain][index];
-            domainIndices[domain]++;
 
-            // Stwórz kartę
+            domainPiles[domain].RemoveAt(index);
+
             GameObject cardObj = Instantiate(cardPrefab, handTransform);
             Card card = cardObj.GetComponent<Card>();
             card.Initialize(cardData, owner);
@@ -104,22 +93,32 @@ namespace CardGame.Manager.Deck
 
         void UpdateDomainPileVisuals()
         {
-            // Aktualizuj liczniki kart w kupkach (opcjonalnie)
-            UpdatePileCounter(pileK_Transform, domainPiles[CardDomain.K].Count, domainIndices[CardDomain.K]);
-            UpdatePileCounter(pileP_Transform, domainPiles[CardDomain.P].Count, domainIndices[CardDomain.P]);
-            UpdatePileCounter(pileM_Transform, domainPiles[CardDomain.M].Count, domainIndices[CardDomain.M]);
-            UpdatePileCounter(pileD_Transform, domainPiles[CardDomain.D].Count, domainIndices[CardDomain.D]);
+            UpdatePileCounter(pileK_Transform, domainPiles[CardDomain.K].Count);
+            UpdatePileCounter(pileP_Transform, domainPiles[CardDomain.P].Count);
+            UpdatePileCounter(pileM_Transform, domainPiles[CardDomain.M].Count);
+            UpdatePileCounter(pileD_Transform, domainPiles[CardDomain.D].Count);
         }
 
-        void UpdatePileCounter(Transform pileTransform, int totalCards, int currentIndex)
+        void UpdatePileCounter(Transform pileTransform, int remainingCards)
         {
+            /*            if (pileTransform == null) return;
+                        int remaining = totalCards > 0 ? ((currentIndex % totalCards) == 0 ? totalCards : totalCards - (currentIndex % totalCards)) : 0;
+                        Debug.Log(remaining.ToString());
+
+                        Text counterText = pileTransform.GetComponentInChildren<Text>();
+                        if (counterText)
+                        {
+
+                            counterText.text = $"{remaining}/{totalCards}";
+                        }*/
+
             if (pileTransform == null) return;
 
             Text counterText = pileTransform.GetComponentInChildren<Text>();
             if (counterText)
             {
-                int remaining = totalCards > 0 ? ((currentIndex % totalCards) == 0 ? totalCards : totalCards - (currentIndex % totalCards)) : 0;
-                counterText.text = $"{remaining}/{totalCards}";
+                // Now it simply shows how many are left in the list
+                counterText.text = $"{remainingCards}";
             }
         }
 

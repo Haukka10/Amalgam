@@ -79,7 +79,7 @@ namespace CardGame.Manager.Main
             if(TypeBattle == TypeBattle.Destroy)
                 currentBilarHP = MaxBilarHP;
 
-            BilarHPText.text = currentBilarHP.ToString();
+            //BilarHPText.text = currentBilarHP.ToString();
 
             UpdateUI();
         }
@@ -117,8 +117,11 @@ namespace CardGame.Manager.Main
             playerDeck.RemoveFromHand(card);
             slot.PlaceCard(card);
 
-            
-            playerDeck.DrawCardFromDomain(card.data.domain);
+            var cardCheck = playerDeck.DrawCardFromDomain(card.data.domain);
+            if (cardCheck == null)
+            {
+                currentState = GameState.GameEnd;
+            }
 
             ClearHighlights();
             selectedCard = null;
@@ -129,6 +132,11 @@ namespace CardGame.Manager.Main
             if (currentState != GameState.PlayerTurn) return;
             //TODO
             Debug.Log($"Kliknięto kupkę domeny: {domain}");
+
+            if (playerDeck.DrawCardFromDomain(domain) == null)
+            {
+                Debug.Log($"lost: {currentState.ToString()}");
+            }
 
         }
 
@@ -279,6 +287,8 @@ namespace CardGame.Manager.Main
             currentState = GameState.PlayerTurn;
             playerTurn = true;
             UpdateUI();
+
+            CheckForEndGame();
         }
 
         //TODO
@@ -327,7 +337,7 @@ namespace CardGame.Manager.Main
             moveButton.interactable = currentState == GameState.PlayerTurn;
             passButton.interactable = currentState == GameState.PlayerTurn;
 
-            BilarHPText.text = currentBilarHP.ToString();
+            //BilarHPText.text = currentBilarHP.ToString();
         }
 
         public void SetGameVariable(string name, object value)

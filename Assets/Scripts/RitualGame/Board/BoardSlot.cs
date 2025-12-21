@@ -24,15 +24,15 @@ namespace CardGame.Board.Slot
         {
             if (currentCard != null) return false;
 
-            // Gracz nie może kłaść na FRONT i BATTLEFIELD
+            if(owner == Player.AI && (slotType == SlotType.FRONT || slotType == SlotType.BATTLEFIELD))
+                return false;
+
             if (owner == Player.Human && (slotType == SlotType.FRONT || slotType == SlotType.BATTLEFIELD))
                 return false;
 
-            // Karty MOD tylko na slotach MOD
             if (card.data.cardType == CardType.Modifier && slotType != SlotType.MOD)
                 return false;
 
-            // Normalne karty nie mogą na MOD
             if (card.data.cardType == CardType.Normal && slotType == SlotType.MOD)
                 return false;
 

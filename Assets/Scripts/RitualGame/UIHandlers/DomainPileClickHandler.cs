@@ -8,7 +8,7 @@ namespace CardGame.UI.DomainPileClick
     {
         public CardDomain domain;
 
-        void OnMouseDown()
+        public void TakeCardForPile()
         {
             if (RitualGameManager.Instance != null)
             {
