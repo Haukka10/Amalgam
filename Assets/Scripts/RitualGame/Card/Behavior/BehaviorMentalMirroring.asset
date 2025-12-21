@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95e66c6366d904e98bc83428217d4fd7, type: 3}
+  m_Name: BehaviorMentalMirroring
+  m_EditorClassIdentifier: Unity.VisualScripting.Flow::Unity.VisualScripting.ScriptGraphAsset
+  _data:
+    _json: '{"graph":{"variables":{"Kind":"Flow","collection":{"$content":[],"$version":"A"},"$version":"A"},"controlInputDefinitions":[],"controlOutputDefinitions":[],"valueInputDefinitions":[],"valueOutputDefinitions":[],"title":"Ability_MentalMirroring","summary":null,"pan":{"x":-36.18768,"y":-1.0},"zoom":1.0,"elements":[{"argumentCount":2,"coroutine":false,"defaultValues":{"target":null,"name":{"$content":"OnPlaced","$type":"System.String"}},"position":{"x":-249.0,"y":-26.0},"guid":"99e0ab7d-ef19-4156-aa41-955afccfa3ae","$version":"A","$type":"Unity.VisualScripting.CustomEvent","$id":"9"},{"defaultValues":{"isPlayerHandRandom":{"$content":false,"$type":"System.Boolean"}},"position":{"x":-408.0,"y":118.0},"guid":"c551582b-c7d3-4628-bd40-88c410f1aed0","$version":"A","$type":"GetRandomCardFromHandNode","$id":"11"},{"defaultValues":{"cardInput":null},"position":{"x":-4.0,"y":-21.0},"guid":"a7718680-7f5c-4c4c-9ce5-837311b3ea55","$version":"A","$type":"SetCardToDomain","$id":"13"},{"sourceUnit":{"$ref":"9"},"sourceKey":"trigger","destinationUnit":{"$ref":"13"},"destinationKey":"inputTrigger","guid":"97444b56-f7f1-4f3d-8825-45b274cbd10f","$type":"Unity.VisualScripting.ControlConnection"},{"sourceUnit":{"$ref":"11"},"sourceKey":"randomCardOutput","destinationUnit":{"$ref":"13"},"destinationKey":"cardInput","guid":"e5411225-38d4-4c73-930e-af877041cd97","$type":"Unity.VisualScripting.ValueConnection"}],"$version":"A"}}'
+    _objectReferences: []

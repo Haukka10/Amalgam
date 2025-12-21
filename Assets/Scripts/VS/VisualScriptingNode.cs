@@ -14,7 +14,7 @@ using CardGame.Manager.Battlefield;
 
 
 [UnitTitle("Apply Power Modifier")]
-[UnitCategory("Rytuały/Card Effects")]
+[UnitCategory("Rituals/Card Effects")]
 public class ApplyPowerModifierNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -47,7 +47,7 @@ public class ApplyPowerModifierNode : Unit
 }
 
 [UnitTitle("Get Card Power")]
-[UnitCategory("Rytuały/Card Info")]
+[UnitCategory("Rituals/Card Info")]
 public class GetCardPowerNode : Unit
 {
     [DoNotSerialize] public ValueInput card;
@@ -65,7 +65,7 @@ public class GetCardPowerNode : Unit
 }
 
 [UnitTitle("Draw Card From Domain")]
-[UnitCategory("Rytuały/Deck")]
+[UnitCategory("Rituals/Deck")]
 public class DrawCardNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -99,7 +99,7 @@ public class DrawCardNode : Unit
 
 // Node 1: Count Cards In Valhalla
 [UnitTitle("Count Cards In Valhalla")]
-[UnitCategory("Rytuały/Advanced")]
+[UnitCategory("Rituals/Advanced")]
 public class CountCardsInValhallaNode : Unit
 {
     [DoNotSerialize] public ValueInput cardNameInput;
@@ -133,7 +133,7 @@ public class CountCardsInValhallaNode : Unit
 
 // Node 2: Return Card To Slot
 [UnitTitle("Return Card To Slot")]
-[UnitCategory("Rytuały/Advanced")]
+[UnitCategory("Rituals/Advanced")]
 public class ReturnCardToSlotNode : Unit
 {
     [DoNotSerialize] public ControlInput returnTrigger;
@@ -187,7 +187,7 @@ public class ReturnCardToSlotNode : Unit
 
 // Node 3: Destroy Card
 [UnitTitle("Destroy Card")]
-[UnitCategory("Rytuały/Advanced")]
+[UnitCategory("Rituals/Advanced")]
 public class DestroyCardNode : Unit
 {
     [DoNotSerialize] public ControlInput destroyCardTrigger;
@@ -218,7 +218,7 @@ public class DestroyCardNode : Unit
 
 // Node 4: Set Game Variable
 [UnitTitle("Set Game Variable")]
-[UnitCategory("Rytuały/Variables")]
+[UnitCategory("Rituals/Variables")]
 public class SetGameVariableNode : Unit
 {
     [DoNotSerialize] public ControlInput setVarTrigger;
@@ -259,7 +259,7 @@ public class SetGameVariableNode : Unit
 
 // Node 5: Get Game Variable
 [UnitTitle("Get Game Variable")]
-[UnitCategory("Rytuały/Variables")]
+[UnitCategory("Rituals/Variables")]
 public class GetGameVariableNode : Unit
 {
     [DoNotSerialize] public ValueInput getVarName;
@@ -289,7 +289,7 @@ public class GetGameVariableNode : Unit
 
 // Node 6: Find Card In Hand By Domain
 [UnitTitle("Find Card In Hand By Domain")]
-[UnitCategory("Rytuały/Hand Effects")]
+[UnitCategory("Rituals/Hand Effects")]
 public class FindCardInHandByDomainNode : Unit
 {
     [DoNotSerialize] public ValueInput domainInput;
@@ -328,7 +328,7 @@ public class FindCardInHandByDomainNode : Unit
 
 // Node 7: Show Card Info UI
 [UnitTitle("Show Card Info UI")]
-[UnitCategory("Rytuały/UI")]
+[UnitCategory("Rituals/UI")]
 public class ShowCardInfoUINode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -365,7 +365,7 @@ public class ShowCardInfoUINode : Unit
 
 // Node 8: Transform Card Data
 [UnitTitle("Transform Card")]
-[UnitCategory("Rytuały/Advanced")]
+[UnitCategory("Rituals/Advanced")]
 public class TransformCardNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -407,7 +407,7 @@ public class TransformCardNode : Unit
 
 // Node 9: Get Opposite MOD Slot
 [UnitTitle("Get Opposite MOD Slot")]
-[UnitCategory("Rytuały/Lane")]
+[UnitCategory("Rituals/Lane")]
 public class GetOppositeMODSlotNode : Unit
 {
     [DoNotSerialize] public ValueInput mySlot;
@@ -449,7 +449,7 @@ public class GetOppositeMODSlotNode : Unit
 
 // Node 10: Copy Card Ability
 [UnitTitle("Copy Card Ability")]
-[UnitCategory("Rytuały/Advanced")]
+[UnitCategory("Rituals/Advanced")]
 public class CopyCardAbilityNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -488,7 +488,7 @@ public class CopyCardAbilityNode : Unit
 
 // Node 11: Set All Cards Face Down
 [UnitTitle("Set All Cards Face Down")]
-[UnitCategory("Rytuały/Board")]
+[UnitCategory("Rituals/Board")]
 public class SetAllCardsFaceDownNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -531,7 +531,7 @@ public class SetAllCardsFaceDownNode : Unit
 
 // Node 12: Flip Power Sign
 [UnitTitle("Flip Power Sign")]
-[UnitCategory("Rytuały/Card Effects")]
+[UnitCategory("Rituals/Card Effects")]
 public class FlipPowerSignNode : Unit
 {
     [DoNotSerialize] public ControlInput inputTrigger;
@@ -568,7 +568,7 @@ public class FlipPowerSignNode : Unit
 
 // Node 13: Check If Slot Type
 [UnitTitle("Check If Slot Type")]
-[UnitCategory("Rytuały/Lane")]
+[UnitCategory("Rituals/Lane")]
 public class CheckIfSlotTypeNode : Unit
 {
     [DoNotSerialize] public ValueInput slot;
@@ -587,5 +587,95 @@ public class CheckIfSlotTypeNode : Unit
 
             return s != null && s.slotType == type;
         });
+    }
+}
+
+[UnitTitle("Get Random Card")]
+[UnitCategory("Rituals/Lane/Gets")]
+public class GetRandomCardFromHandNode : Unit
+{
+    [DoNotSerialize] public ValueInput isPlayerHandRandom;
+    [DoNotSerialize] public ValueOutput randomCardOutput;
+
+    protected override void Definition()
+    {
+        isPlayerHandRandom = ValueInput<bool>(nameof(isPlayerHandRandom), true);
+
+        randomCardOutput = ValueOutput<Card>(nameof(randomCardOutput), (flow) =>
+        {
+            bool playerHand = flow.GetValue<bool>(isPlayerHandRandom);
+
+            List<Card> hand = playerHand ?
+                RitualGameManager.Instance?.GetPlayerHand() :
+                RitualGameManager.Instance?.GetEnemyHand();
+
+            if (hand != null && hand.Count > 0)
+            {
+                return hand[UnityEngine.Random.Range(0, hand.Count)];
+            }
+
+            return null;
+        });
+    }
+}
+
+[UnitTitle("Set Card To Domain")]
+[UnitCategory("Rituals/Deck")]
+public class SetCardToDomain : Unit
+{
+    [DoNotSerialize] public ControlInput inputTrigger;
+    [DoNotSerialize] public ControlOutput outputTrigger;
+
+    [DoNotSerialize] public ValueInput cardInput;
+
+    protected override void Definition()
+    {
+
+        inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
+        {
+            DeckManager manager = Object.FindAnyObjectByType<DeckManager>();
+            Card targetCard = flow.GetValue<Card>(cardInput);
+
+            if (targetCard != null && manager != null)
+            {
+                
+                if (targetCard.data.domain == CardDomain.K)
+                {
+                    manager.domainK_Pile.Add(targetCard.data);
+
+                    Debug.Log($"Card {targetCard.name} added to Domain K");
+                }
+
+                if (targetCard.data.domain == CardDomain.D)
+                {
+                    manager.domainD_Pile.Add(targetCard.data);
+
+                    Debug.Log($"Card {targetCard.name} added to Domain K");
+                }
+
+                if (targetCard.data.domain == CardDomain.M)
+                {
+                    manager.domainM_Pile.Add(targetCard.data);
+
+                    Debug.Log($"Card {targetCard.name} added to Domain K");
+                }
+
+                if (targetCard.data.domain == CardDomain.P)
+                {
+                    manager.domainP_Pile.Add(targetCard.data);
+
+                    Debug.Log($"Card {targetCard.name} added to Domain K");
+                }
+            }
+
+            return outputTrigger;
+        });
+
+        outputTrigger = ControlOutput(nameof(outputTrigger));
+
+        cardInput = ValueInput<Card>(nameof(cardInput), null);
+
+        Requirement(cardInput, inputTrigger);
+        Succession(inputTrigger, outputTrigger);
     }
 }
