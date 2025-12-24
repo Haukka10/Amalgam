@@ -117,7 +117,7 @@ public class CountCardsInValhallaNode : Unit
             if (bf == null) return 0;
 
             int c = 0;
-            foreach (Transform child in bf.valhallaTransform)
+            foreach (Transform child in bf.ValhallaSlot.transform)
             {
                 Card card = child.GetComponent<Card>();
                 if (card != null && card.data.cardName == name)
@@ -375,6 +375,8 @@ public class TransformCardNode : Unit
     [DoNotSerialize] public ValueInput newName;
     [DoNotSerialize] public ValueInput newPower;
 
+    [DoNotSerialize] public ValueOutput transformedCard;
+
     protected override void Definition()
     {
         inputTrigger = ControlInput(nameof(inputTrigger), (flow) =>
@@ -386,12 +388,20 @@ public class TransformCardNode : Unit
             if (c != null)
             {
                 // Create new CardData (or modify existing)
+                c.data.abilityGraph = null;
                 c.currentPower = power;
                 c.UpdateVisuals();
-
                 // For name change, would need to create new CardData
                 Debug.Log($"Card transformed to: {name} with power {power}");
+
+                // Set the output value
+                flow.SetValue(transformedCard, c);
+            } 
+            else
+            {
+                Debug.LogError("Wokrin but no card is set");
             }
+
 
             return outputTrigger;
         });
@@ -400,8 +410,10 @@ public class TransformCardNode : Unit
         card = ValueInput<Card>(nameof(card), null);
         newName = ValueInput<string>(nameof(newName), "");
         newPower = ValueInput<int>(nameof(newPower), 0);
+        transformedCard = ValueOutput<Card>(nameof(transformedCard));
 
         Succession(inputTrigger, outputTrigger);
+        Assignment(inputTrigger, transformedCard);
     }
 }
 
@@ -590,6 +602,7 @@ public class CheckIfSlotTypeNode : Unit
     }
 }
 
+// Node 14: Get Random Card
 [UnitTitle("Get Random Card")]
 [UnitCategory("Rituals/Lane/Gets")]
 public class GetRandomCardFromHandNode : Unit
@@ -619,6 +632,7 @@ public class GetRandomCardFromHandNode : Unit
     }
 }
 
+// Node 15: Set Card To Domain
 [UnitTitle("Set Card To Domain")]
 [UnitCategory("Rituals/Deck")]
 public class SetCardToDomain : Unit

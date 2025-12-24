@@ -18,4 +18,4 @@ MonoBehaviour:
   basePower: 5
   artwork: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   description: This crad is for debug and testing
-  abilityGraph: {fileID: 11400000, guid: 98721adfb8b14ed47b9472ca5344818d, type: 2}
+  abilityGraph: {fileID: 11400000, guid: 8600a77d61e4249449ce9431039467d9, type: 2}

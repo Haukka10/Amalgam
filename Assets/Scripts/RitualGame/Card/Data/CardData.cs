@@ -2,7 +2,7 @@
 using Unity.VisualScripting;
 using static CardGame.Structures.Structures;
 
-[CreateAssetMenu(fileName = "NewCard", menuName = "Rytuały/Card")]
+[CreateAssetMenu(fileName = "NewCard", menuName = "Rituals/Card")]
 public class CardData : ScriptableObject
 {
     public string cardName;

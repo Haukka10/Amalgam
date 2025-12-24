@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogData
   dialogNodes:
   - nodeID: ede4f811-9067-4b10-819c-eccb5e920db9
-    npcName: NPC
+    npcName: banan
     dialogText: Enter dialog text here...
     options:
     - optionText: Option 1
@@ -40,10 +40,10 @@ MonoBehaviour:
               connectionPoint: {x: 1020, y: 300}
             position: {x: 871, y: 181}
             isEntryNode: 0
-          connectionPoint: {x: 706, y: 286}
+          connectionPoint: {x: 812, y: 296}
         position: {x: 557, y: 167}
         isEntryNode: 0
-      connectionPoint: {x: 389, y: 470}
+      connectionPoint: {x: 391, y: 371}
     - optionText: New Option
       nextNode:
         nodeID: 2a200609-a376-40cc-8059-89d6541efa25
@@ -70,7 +70,7 @@ MonoBehaviour:
           connectionPoint: {x: 701, y: 414}
         position: {x: 552, y: 295}
         isEntryNode: 0
-      connectionPoint: {x: 389, y: 495}
+      connectionPoint: {x: 391, y: 396}
     - optionText: New Option
       nextNode:
         nodeID: f2e088aa-5903-4934-b754-38845fedd7a5
@@ -88,8 +88,8 @@ MonoBehaviour:
           connectionPoint: {x: 747, y: 555}
         position: {x: 547, y: 453}
         isEntryNode: 0
-      connectionPoint: {x: 389, y: 520}
-    position: {x: 143, y: 295}
+      connectionPoint: {x: 391, y: 421}
+    position: {x: 136, y: 242}
     isEntryNode: 0
   - nodeID: 4cc25299-6fe2-4409-be44-5c3a29bea35a
     npcName: NPC
@@ -112,7 +112,7 @@ MonoBehaviour:
           connectionPoint: {x: 1020, y: 300}
         position: {x: 871, y: 181}
         isEntryNode: 0
-      connectionPoint: {x: 803, y: 342}
+      connectionPoint: {x: 812, y: 296}
     position: {x: 557, y: 167}
     isEntryNode: 0
   - nodeID: 2a200609-a376-40cc-8059-89d6541efa25
@@ -136,7 +136,7 @@ MonoBehaviour:
           connectionPoint: {x: 1020, y: 300}
         position: {x: 871, y: 181}
         isEntryNode: 0
-      connectionPoint: {x: 798, y: 470}
+      connectionPoint: {x: 807, y: 424}
     position: {x: 552, y: 295}
     isEntryNode: 0
   - nodeID: f2e088aa-5903-4934-b754-38845fedd7a5
@@ -151,7 +151,7 @@ MonoBehaviour:
         options: []
         position: {x: 0, y: 0}
         isEntryNode: 0
-      connectionPoint: {x: 793, y: 628}
+      connectionPoint: {x: 802, y: 582}
     position: {x: 547, y: 453}
     isEntryNode: 0
   entryNode:
@@ -233,5 +233,5 @@ MonoBehaviour:
       connectionPoint: {x: 292, y: 464}
     position: {x: 143, y: 295}
     isEntryNode: 0
-  editorOffset: {x: 46, y: 73}
+  editorOffset: {x: 55, y: 27}
   editorZoom: 1

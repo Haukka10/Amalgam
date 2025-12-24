@@ -9,6 +9,8 @@ namespace CardGame.AI
 {
     public class AdvancedAI : MonoBehaviour
     {
+        public bool PassTurn = false;
+
         private PlayerLane aiLane;
         private DeckManager aiDeck;
 
@@ -20,10 +22,11 @@ namespace CardGame.AI
 
         public void ExecuteTurn()
         {
-            // Strategia AI:
-            // 1. Zagraj MOD karty jeśli są dostępne
-            // 2. Zagraj najsilniejszą kartę
-            // 3. Przesuń karty jeśli BACK jest zajęty
+            if (PassTurn == true)
+            {
+                PassTurn = !PassTurn;
+                return;
+            }
 
             var hand = aiDeck.GetHand();
 
@@ -65,18 +68,17 @@ namespace CardGame.AI
             if (card.data.cardType == CardType.Modifier)
             {
                 if (aiLane.modSlot1.CanPlaceCard(card))
-
                     return aiLane.modSlot1;
+
                 if (aiLane.modSlot2.CanPlaceCard(card)) 
                     return aiLane.modSlot2;
             }
             else
             {
                 if (aiLane.backSlot.CanPlaceCard(card)) 
-
                     return aiLane.backSlot;
-                if (aiLane.midSlot.CanPlaceCard(card)) 
 
+                if (aiLane.midSlot.CanPlaceCard(card)) 
                     return aiLane.midSlot;
             }
             return null;

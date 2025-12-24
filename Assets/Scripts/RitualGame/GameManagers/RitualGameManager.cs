@@ -62,6 +62,8 @@ namespace CardGame.Manager.Main
 
         public GameState currentState = GameState.PlayerTurn;
         public Dictionary<string, object> gameVariables = new Dictionary<string, object>();
+        private bool _FarcePass;
+        private AdvancedAI _AiComp;
 
         public enum GameState { PlayerTurn, AITurn, Battle, GameEnd }
 
@@ -78,6 +80,13 @@ namespace CardGame.Manager.Main
             SetType();
             if(TypeBattle == TypeBattle.Destroy)
                 currentBilarHP = MaxBilarHP;
+
+            AdvancedAI ai = GetComponent<AdvancedAI>();
+            if (ai == null)
+            {
+                _AiComp = gameObject.AddComponent<AdvancedAI>();
+                _AiComp.Initialize(aiLane, aiDeck);
+            }
 
             //BilarHPText.text = currentBilarHP.ToString();
 
@@ -155,6 +164,7 @@ namespace CardGame.Manager.Main
         {
             ProcessTurnEffects();
             currentState = GameState.AITurn;
+
             UpdateUI();
             Invoke(nameof(ExecuteAITurn), 1f);
         }
@@ -165,6 +175,13 @@ namespace CardGame.Manager.Main
 
             foreach (var kvp in gameVariables.ToList())
             {
+                if (kvp.Key.Contains("opponentMoveBlocked") && kvp.Value is bool)
+                {
+                    _AiComp.PassTurn = true;
+                    ForcePass();
+                    gameVariables.Remove(kvp.Key);
+                }
+
                 if (kvp.Key.Contains("TurnsLeft") && kvp.Value is int)
                 {
                     int turns = (int)kvp.Value;
@@ -232,6 +249,15 @@ namespace CardGame.Manager.Main
                 SetGameVariable("allCardsFaceDown", false);
                 RevealAllCards();
             }
+
+            battlefield.GraveyardSlot.currentCard.TriggerAbility("TriggerDelayedEffect", null);
+            battlefield.ValhallaSlot.currentCard.TriggerAbility("TriggerDelayedEffect", null);
+        }
+
+        void ForcePass()
+        {
+            moveButton.interactable = _FarcePass;
+            _FarcePass = !_FarcePass;
         }
 
         void RevealAllCards()
@@ -260,14 +286,7 @@ namespace CardGame.Manager.Main
 
         void ExecuteAITurn()
         {
-            AdvancedAI ai = GetComponent<AdvancedAI>();
-            if (ai == null)
-            {
-                ai = gameObject.AddComponent<AdvancedAI>();
-                ai.Initialize(aiLane, aiDeck);
-            }
-
-            ai.ExecuteTurn();
+            _AiComp.ExecuteTurn();
 
             CheckForBattle();
         }
@@ -358,7 +377,7 @@ namespace CardGame.Manager.Main
         // Publiczne metody do użycia w Visual Scripting
         public List<Card> GetPlayerHand() => playerDeck.GetHand();
         public List<Card> GetEnemyHand() => aiDeck.GetHand();
-        public Card GetBattlefieldCard() => battlefield.battlefieldSlot.currentCard;
+        public Card GetBattlefieldCard() => battlefield.BattlefieldSlot.currentCard;
         public PlayerLane GetPlayerLane() => playerLane;
         public PlayerLane GetEnemyLane() => aiLane;
     }

@@ -8,15 +8,15 @@ namespace CardGame.Manager.Battlefield
 {
     public class BattlefieldManager : MonoBehaviour
     {
-        public BoardSlot battlefieldSlot;
-        public Transform valhallaTransform;
-        public Transform graveyardTransform;
+        public BoardSlot BattlefieldSlot;
+        public BoardSlot ValhallaSlot;
+        public BoardSlot GraveyardSlot;
 
         [Header("Battle Settings")]
-        public Transform playerBattlePosition;
-        public Transform aiBattlePosition;
-        public float cardDisplayTime = 1.5f; // How lang show before battle
-        public float resultDisplayTime = 1f; // Time to show resulat
+        public Transform PlayerBattlePosition;
+        public Transform AiBattlePosition;
+        public float CardDisplayTime = 1.5f; // How lang show before battle
+        public float ResultDisplayTime = 1f; // Time to show resulat
 
         private RitualGameManager _gameManager;
 
@@ -30,10 +30,10 @@ namespace CardGame.Manager.Battlefield
         {
             Debug.Log($"Battle: {playerCard.data.cardName} ({playerCard.GetEffectivePower()}) vs {aiCard.data.cardName} ({aiCard.GetEffectivePower()})");
 
-            PlaceCardOnBattlefield(playerCard, playerBattlePosition);
-            PlaceCardOnBattlefield(aiCard, aiBattlePosition);
+            PlaceCardOnBattlefield(playerCard, PlayerBattlePosition);
+            PlaceCardOnBattlefield(aiCard, AiBattlePosition);
 
-            yield return new WaitForSeconds(cardDisplayTime);
+            yield return new WaitForSeconds(CardDisplayTime);
 
             // Trigger battle abilities
             playerCard.TriggerAbility("OnBattle", aiCard);
@@ -59,7 +59,7 @@ namespace CardGame.Manager.Battlefield
             else
             {
                 // Remis
-                yield return new WaitForSeconds(resultDisplayTime);
+                yield return new WaitForSeconds(ResultDisplayTime);
                 SendToGraveyard(playerCard);
                 SendToGraveyard(aiCard);
                 yield break;
@@ -74,7 +74,7 @@ namespace CardGame.Manager.Battlefield
                 _gameManager.currentBilarHP -= winner.GetEffectivePower();
             }
 
-            yield return new WaitForSeconds(resultDisplayTime);
+            yield return new WaitForSeconds(ResultDisplayTime);
 
             SendToValhalla(winner);
             SendToGraveyard(loser);
@@ -84,7 +84,7 @@ namespace CardGame.Manager.Battlefield
 
         void PlaceCardOnBattlefield(Card card, Transform position)
         {
-            card.transform.SetParent(battlefieldSlot.transform);
+            card.transform.SetParent(BattlefieldSlot.transform);
 
             if (position != null)
             {
@@ -104,17 +104,19 @@ namespace CardGame.Manager.Battlefield
 
         void SendToValhalla(Card card)
         {
-            card.transform.SetParent(valhallaTransform);
+            card.transform.SetParent(ValhallaSlot.transform);
             card.transform.localPosition = Vector3.zero;
             card.TriggerAbility("OnVictory", null);
+            ValhallaSlot.currentCard = card;
             Debug.Log($"{card.data.cardName} Go to Valhalli!");
         }
 
         void SendToGraveyard(Card card)
         {
-            card.transform.SetParent(graveyardTransform);
+            card.transform.SetParent(GraveyardSlot.transform);
             card.transform.localPosition = Vector3.zero;
             card.TriggerAbility("OnDefeat", null);
+            GraveyardSlot.currentCard = card;
             Debug.Log($"{card.data.cardName} Go to Cemeteries!");
         }
     }

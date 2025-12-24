@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2e6140038c46aa04f9f0d3e898f4879f, type: 3}
-  m_Name: TextCard 1
+  m_Name: TextCard 6
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: Test2
-  domain: 2
+  cardName: Test6
+  domain: 1
   cardType: 0
-  basePower: 10
-  artwork: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  basePower: 5
+  artwork: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   description: This crad is for debug and testing
-  abilityGraph: {fileID: 11400000, guid: 8600a77d61e4249449ce9431039467d9, type: 2}
+  abilityGraph: {fileID: 11400000, guid: afb16c82eec56744eb2c2f1a61328399, type: 2}
