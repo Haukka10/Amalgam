@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CardGame.Manager.Main;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,8 @@ public class DialogManager : MonoBehaviour
 
     private DialogData currentDialog;
     private DialogNode currentNode;
+
+    private int DialogBalans;
 
     void Awake()
     {
@@ -112,6 +115,15 @@ public class DialogManager : MonoBehaviour
         dialogPanel.SetActive(false);
         currentDialog = null;
         currentNode = null;
+
+        if(currentNode.IsStartCardGame)
+        {
+            var c = FindAnyObjectByType<RitualGameManager>();
+            c.SetType(0);
+
+            //Dealy to Setup board
+            Invoke(nameof(c.StartRitualGame), 0.75f);
+        }
     }
 
     void DEBUG_PrintOptions(DialogNode dialog)

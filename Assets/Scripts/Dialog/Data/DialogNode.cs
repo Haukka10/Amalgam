@@ -9,6 +9,7 @@ public class DialogNode
     [TextArea(3, 6)]
     public string dialogText;
     public List<DialogOption> options = new List<DialogOption>();
+    public bool IsStartCardGame = false;
 
 #if UNITY_EDITOR
     [HideInInspector] public Vector2 position;

@@ -1,19 +1,16 @@
 ﻿using TMPro;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.UI;
+using Unity.Collections;
 using System.Collections.Generic;
 
 using CardGame.AI;
 using CardGame.CardObj;
-using CardGame.Board.Slot;
 using CardGame.Board.Lane;
+using CardGame.Board.Slot;
 using CardGame.Manager.Deck;
 using CardGame.Manager.Battlefield;
-
-using static CardGame.Structures.Structures;
-using System.Linq;
-using System;
-using Unity.Collections;
 
 namespace CardGame.Manager.Main
 {
@@ -38,6 +35,7 @@ namespace CardGame.Manager.Main
         public DeckManager playerDeck;
         public DeckManager aiDeck;
         public BattlefieldManager battlefield;
+        public GameObject Board = null;
 
         [Header("UI")]
         public Button moveButton;
@@ -72,13 +70,12 @@ namespace CardGame.Manager.Main
             Instance = this;
         }
 
-        void Start()
+        public void StartRitualGame()
         {
             moveButton.onClick.AddListener(OnMoveButtonClicked);
             passButton.onClick.AddListener(OnPassButtonClicked);
 
-            SetType();
-            if(TypeBattle == TypeBattle.Destroy)
+            if (TypeBattle == TypeBattle.Destroy)
                 currentBilarHP = MaxBilarHP;
 
             AdvancedAI ai = GetComponent<AdvancedAI>();
@@ -91,9 +88,11 @@ namespace CardGame.Manager.Main
             //BilarHPText.text = currentBilarHP.ToString();
 
             UpdateUI();
+
+            Board.SetActive(true);
         }
 
-        public void SetType()
+        public void SetType(int Balance)
         {
             var r = UnityEngine.Random.Range(0, 1);
             TypeBattle = (TypeBattle)r;
@@ -122,7 +121,7 @@ namespace CardGame.Manager.Main
 
         public void PlayCardOnSlot(Card card, BoardSlot slot)
         {
-            
+
             playerDeck.RemoveFromHand(card);
             slot.PlaceCard(card);
 
@@ -140,7 +139,7 @@ namespace CardGame.Manager.Main
         {
             if (currentState != GameState.PlayerTurn) return;
             //TODO
-            Debug.Log($"Kliknięto kupkę domeny: {domain}");
+            Debug.Log($"Domain pile clicked: {domain}");
 
             if (playerDeck.DrawCardFromDomain(domain) == null)
             {
@@ -229,7 +228,7 @@ namespace CardGame.Manager.Main
 
             if (allCardsFaceDown)
             {
-                foreach(var la in lane.slots)
+                foreach (var la in lane.slots)
                 {
                     la.currentCard.SetHidden(true);
                 }
@@ -313,9 +312,9 @@ namespace CardGame.Manager.Main
         //TODO
         public void CheckForEndGame()
         {
-            if(TypeBattle == TypeBattle.Heal)
+            if (TypeBattle == TypeBattle.Heal)
             {
-                if(currentBilarHP == MaxBilarHP)
+                if (currentBilarHP == MaxBilarHP)
                 {
                     Debug.Log("Win in Heal mode");
                     currentState = GameState.GameEnd;
@@ -323,7 +322,7 @@ namespace CardGame.Manager.Main
             }
             else
             {
-                if(currentBilarHP <= 0)
+                if (currentBilarHP <= 0)
                 {
                     Debug.Log("Win in Destroy mode");
                     currentState = GameState.GameEnd;

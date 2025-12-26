@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using static CardGame.Structures.Structures;
 
+///
+/// currently not in use
+///
 namespace CardGame.Helper.Board
 {
     public class RitualBoardSetup : MonoBehaviour
