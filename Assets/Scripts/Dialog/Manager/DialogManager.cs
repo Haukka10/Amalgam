@@ -25,8 +25,6 @@ public class DialogManager : MonoBehaviour
     private DialogData currentDialog;
     private DialogNode currentNode;
 
-    private int DialogBalans;
-
     void Awake()
     {
         if (Instance == null)
@@ -49,21 +47,26 @@ public class DialogManager : MonoBehaviour
 
     public void StartDialog(DialogData dialog)
     {
-        Debug.Log(dialog.entryNode.dialogText);
-        Debug.Log(dialog.entryNode.npcName);
-        //Debug
-        currentNode = dialog.dialogNodes[0];
-        SelectOption(0);
-        //EndDebug
         currentDialog = dialog;
         dialogPanel.SetActive(true);
 
-        if (dialog.entryNode != null)
-            ShowDialog(dialog.entryNode);
-        else if (dialog.dialogNodes.Count > 0)
-            ShowDialog(dialog.dialogNodes[0]);
+        // Start with entry node or first node
+        DialogNode startNode = dialog.entryNode;
+        if (startNode == null && dialog.dialogNodes.Count > 0)
+        {
+            startNode = dialog.dialogNodes[0];
+        }
+
+        if (startNode != null)
+        {
+            Debug.Log($"Starting dialog: {startNode.npcName} - {startNode.dialogText}");
+            ShowDialog(startNode);
+        }
         else
+        {
+            Debug.LogError("No valid entry node found!");
             EndDialog();
+        }
     }
 
     void ShowDialog(DialogNode node)
@@ -99,38 +102,81 @@ public class DialogManager : MonoBehaviour
 
     void SelectOption(int optionIndex)
     {
-        if (optionIndex >= currentNode.options.Count)
+        if (currentNode == null || optionIndex >= currentNode.options.Count)
             return;
 
-        DialogNode nextNode = currentNode.options[optionIndex].nextNode;
-        DEBUG_PrintOptions(nextNode);
-        if (nextNode == null || nextNode.options.Count == 0 || nextNode.dialogText == string.Empty)
+        // Get next node by ID instead of direct reference
+        string nextNodeID = currentNode.options[optionIndex].nextNodeID;
+
+        if (string.IsNullOrEmpty(nextNodeID))
+        {
+            // Empty nextNodeID means end of dialog
             EndDialog();
+            return;
+        }
+
+        DialogNode nextNode = currentDialog.GetNodeByID(nextNodeID);
+
+        if (nextNode == null)
+        {
+            Debug.LogError($"Could not find node with ID: {nextNodeID}");
+            EndDialog();
+            return;
+        }
+
+        DEBUG_PrintOptions(nextNode);
+
+        if (nextNode.options.Count == 0 || string.IsNullOrEmpty(nextNode.dialogText))
+        {
+            EndDialog();
+        }
         else
+        {
             ShowDialog(nextNode);
+        }
     }
 
     void EndDialog()
     {
-        dialogPanel.SetActive(false);
-        currentDialog = null;
-        currentNode = null;
+        if (currentDialog == null)
+        {
+            Debug.LogError("currentDialog is not set.");
+            return;
+        }
 
-        if(currentNode.IsStartCardGame)
+        dialogPanel.SetActive(false);
+
+        // FIXED: Check if the CURRENT NODE triggers card game
+        if (currentNode != null && currentNode.IsStartCardGame)
         {
             var c = FindAnyObjectByType<RitualGameManager>();
-            c.SetType(0);
+            if (c != null)
+            {
+                c.SetType(0);
+                // Delay to setup board
+                Invoke(nameof(StartCardGame), 0.75f);
+            }
+        }
 
-            //Dealy to Setup board
-            Invoke(nameof(c.StartRitualGame), 0.75f);
+        currentDialog = null;
+        currentNode = null;
+    }
+
+    void StartCardGame()
+    {
+        var c = FindAnyObjectByType<RitualGameManager>();
+        if (c != null)
+        {
+            c.StartRitualGame();
         }
     }
 
     void DEBUG_PrintOptions(DialogNode dialog)
     {
-        foreach(var c in dialog.options)
+        Debug.Log($"Node '{dialog.nodeID}' has {dialog.options.Count} options:");
+        foreach (var option in dialog.options)
         {
-            Debug.Log(c.optionText);
+            Debug.Log($"  - {option.optionText} -> {option.nextNodeID}");
         }
     }
 }

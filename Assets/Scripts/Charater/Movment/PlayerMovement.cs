@@ -79,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
         rb.MovePosition(newPos);
 
         // tell your renderer the movement direction (you might prefer input or movement)
-        if (characterRenderer != null)
-            characterRenderer.SetDirection(movement);
+/*        if (characterRenderer != null)
+            characterRenderer.SetDirection(movement);*/
     }
 }

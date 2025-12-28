@@ -1,26 +1,27 @@
 ﻿#if UNITY_EDITOR
-
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-#if UNITY_EDITOR
 [CustomEditor(typeof(DialogData))]
 public class DialogDataEditor : Editor
 {
     SerializedProperty dialogNodesProp;
-    SerializedProperty entryNodeProp;
+    SerializedProperty entryNodeIDProp;
+
+    private DialogNode cachedSelectedNode;
+    private int cachedNodeIndex = -1;
+    private string[] cachedNodeNames;
 
     void OnEnable()
     {
         dialogNodesProp = serializedObject.FindProperty("dialogNodes");
-        entryNodeProp = serializedObject.FindProperty("entryNode");
+        entryNodeIDProp = serializedObject.FindProperty("entryNodeID");
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-
         DialogData data = (DialogData)target;
 
         EditorGUILayout.HelpBox("Use the Visual Editor window to edit this dialog tree.", MessageType.Info);
@@ -30,47 +31,50 @@ public class DialogDataEditor : Editor
             DialogVisualEditor.OpenWindow(data);
         }
 
-        if (GUILayout.Button("Reload Dialog DO NOT CLICK IN WIP", GUILayout.Height(25)))
-        {
-            // Force Unity to re-read the ScriptableObject
-            AssetDatabase.Refresh();
-            AssetDatabase.SaveAssets();
-
-            // Reload inspector and visual editor
-            serializedObject.Update();
-            DialogVisualEditor.inspectorSelectedNode = null;
-
-            // Repaint all editor windows that depend on this data
-            EditorWindow.FocusWindowIfItsOpen<DialogVisualEditor>();
-            var win = EditorWindow.GetWindow<DialogVisualEditor>();
-            if (win != null)
-            {
-                win.Repaint();
-            }
-
-            Debug.Log($"Dialog '{data.name}' reloaded.");
-        }
-
-
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField("Quick Info", EditorStyles.boldLabel);
         EditorGUILayout.LabelField($"Total Nodes: {data.dialogNodes.Count}");
-        EditorGUILayout.PropertyField(entryNodeProp, new GUIContent("Entry Node"));
+
+        // Entry Node dropdown - cache node names
+        if (cachedNodeNames == null || cachedNodeNames.Length != data.dialogNodes.Count + 1)
+        {
+            cachedNodeNames = GetNodeNamesArray(data);
+        }
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Entry Node:", GUILayout.Width(80));
+        int entryIndex = GetNodeIndexByID(data, data.entryNodeID);
+        int newEntryIndex = EditorGUILayout.Popup(entryIndex + 1, cachedNodeNames) - 1;
+
+        if (newEntryIndex != entryIndex)
+        {
+            Undo.RecordObject(data, "Set Entry Node");
+            data.entryNodeID = (newEntryIndex < 0) ? "" : data.dialogNodes[newEntryIndex].nodeID;
+            EditorUtility.SetDirty(data);
+        }
+        EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
 
-        // Show the node selected in the visual editor (if any)
+        // Show selected node details - OPTIMIZED
         var selNode = DialogVisualEditor.inspectorSelectedNode;
         if (selNode == null)
         {
+            cachedSelectedNode = null;
+            cachedNodeIndex = -1;
             EditorGUILayout.LabelField("No node selected in Visual Editor.");
             serializedObject.ApplyModifiedProperties();
             return;
         }
 
-        // ensure the selected node belongs to this DialogData
-        int nodeIndex = data.dialogNodes.IndexOf(selNode);
-        if (nodeIndex < 0)
+        // Cache node index lookup
+        if (selNode != cachedSelectedNode)
+        {
+            cachedSelectedNode = selNode;
+            cachedNodeIndex = data.dialogNodes.IndexOf(selNode);
+        }
+
+        if (cachedNodeIndex < 0)
         {
             EditorGUILayout.HelpBox("Selected node is not part of this DialogData asset.", MessageType.Warning);
             serializedObject.ApplyModifiedProperties();
@@ -78,16 +82,29 @@ public class DialogDataEditor : Editor
         }
 
         EditorGUILayout.LabelField("Selected Node", EditorStyles.boldLabel);
-
-        // Get SerializedProperty for the selected node
-        SerializedProperty nodeProp = dialogNodesProp.GetArrayElementAtIndex(nodeIndex);
+        SerializedProperty nodeProp = dialogNodesProp.GetArrayElementAtIndex(cachedNodeIndex);
 
         EditorGUI.indentLevel++;
-        // NPC Name & Dialog Text (use SerializedProperty so Undo works)
+
+        // Node ID (read-only)
+        EditorGUILayout.LabelField("Node ID:", selNode.nodeID);
+
+        // NPC Name & Dialog Text
         var npcNameProp = nodeProp.FindPropertyRelative("npcName");
         var dialogTextProp = nodeProp.FindPropertyRelative("dialogText");
         EditorGUILayout.PropertyField(npcNameProp, new GUIContent("NPC Name"));
         EditorGUILayout.PropertyField(dialogTextProp, new GUIContent("Dialog Text"));
+
+        // Start Card Game Toggle
+        EditorGUILayout.Space(5);
+        bool currentStartCardGame = selNode.IsStartCardGame;
+        bool newStartCardGame = EditorGUILayout.Toggle("Start Card Game", currentStartCardGame);
+        if (newStartCardGame != currentStartCardGame)
+        {
+            Undo.RecordObject(data, "Toggle Start Card Game");
+            selNode.IsStartCardGame = newStartCardGame;
+            EditorUtility.SetDirty(data);
+        }
 
         // Options
         var optionsProp = nodeProp.FindPropertyRelative("options");
@@ -95,36 +112,23 @@ public class DialogDataEditor : Editor
         EditorGUILayout.LabelField($"Options ({optionsProp.arraySize})", EditorStyles.miniBoldLabel);
         EditorGUI.indentLevel++;
 
-        // Build name array for popup (first entry = None)
-        string[] nodeNames = new string[data.dialogNodes.Count + 1];
-        nodeNames[0] = "<None>";
-        for (int n = 0; n < data.dialogNodes.Count; n++)
-            nodeNames[n + 1] = !string.IsNullOrEmpty(data.dialogNodes[n].npcName) ? data.dialogNodes[n].npcName : $"Node {n}";
-
         for (int i = 0; i < optionsProp.arraySize; i++)
         {
             var optProp = optionsProp.GetArrayElementAtIndex(i);
             var optionTextProp = optProp.FindPropertyRelative("optionText");
 
             EditorGUILayout.BeginHorizontal();
-            // Option text (serialized so ApplyModifiedProperties handles it & Undo works)
             EditorGUILayout.PropertyField(optionTextProp, new GUIContent($"Option {i + 1}"));
 
-            // Next node popup (we change the underlying data object directly to set nextNode)
-            // Determine current selection index
-            DialogOption optRef = data.dialogNodes[nodeIndex].options[i];
-            int currentSelection = 0;
-            if (optRef.nextNode != null)
-            {
-                int idx = data.dialogNodes.IndexOf(optRef.nextNode);
-                if (idx >= 0) currentSelection = idx + 1; // +1 because 0 is None
-            }
+            // Next node dropdown
+            DialogOption optRef = selNode.options[i];
+            int currentIndex = GetNodeIndexByID(data, optRef.nextNodeID);
+            int newIndex = EditorGUILayout.Popup(currentIndex + 1, cachedNodeNames, GUILayout.Width(150)) - 1;
 
-            int newSelection = EditorGUILayout.Popup(currentSelection, nodeNames, GUILayout.Width(150));
-            if (newSelection != currentSelection)
+            if (newIndex != currentIndex)
             {
                 Undo.RecordObject(data, "Set Option Next Node");
-                optRef.nextNode = (newSelection == 0) ? null : data.dialogNodes[newSelection - 1];
+                optRef.nextNodeID = (newIndex < 0) ? "" : data.dialogNodes[newIndex].nodeID;
                 EditorUtility.SetDirty(data);
             }
 
@@ -133,36 +137,56 @@ public class DialogDataEditor : Editor
 
         EditorGUILayout.Space(4);
         EditorGUILayout.BeginHorizontal();
+
         if (GUILayout.Button("+ Add Option"))
         {
             Undo.RecordObject(data, "Add Dialog Option");
-            data.dialogNodes[nodeIndex].options.Add(new DialogOption { optionText = "New Option", nextNode = null });
+            selNode.options.Add(new DialogOption { optionText = "New Option", nextNodeID = "" });
             EditorUtility.SetDirty(data);
-            // Update serialized object so inspector immediately shows the new prop
             serializedObject.Update();
-            optionsProp = nodeProp.FindPropertyRelative("options");
+            cachedNodeNames = null; // Invalidate cache
         }
 
-        if (optionsProp.arraySize > 0)
+        if (optionsProp.arraySize > 0 && GUILayout.Button("- Remove Last"))
         {
-            if (GUILayout.Button("- Remove Last Option"))
-            {
-                Undo.RecordObject(data, "Remove Dialog Option");
-                data.dialogNodes[nodeIndex].options.RemoveAt(data.dialogNodes[nodeIndex].options.Count - 1);
-                EditorUtility.SetDirty(data);
-                serializedObject.Update();
-                optionsProp = nodeProp.FindPropertyRelative("options");
-            }
+            Undo.RecordObject(data, "Remove Dialog Option");
+            selNode.options.RemoveAt(selNode.options.Count - 1);
+            EditorUtility.SetDirty(data);
+            serializedObject.Update();
         }
-        EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.EndHorizontal();
         EditorGUI.indentLevel -= 2;
 
         serializedObject.ApplyModifiedProperties();
     }
-}
-#endif
 
+    int GetNodeIndexByID(DialogData data, string nodeID)
+    {
+        if (string.IsNullOrEmpty(nodeID)) return -1;
+
+        // Fast lookup without creating intermediate list
+        for (int i = 0; i < data.dialogNodes.Count; i++)
+        {
+            if (data.dialogNodes[i].nodeID == nodeID)
+                return i;
+        }
+        return -1;
+    }
+
+    string[] GetNodeNamesArray(DialogData data)
+    {
+        string[] names = new string[data.dialogNodes.Count + 1];
+        names[0] = "<None>";
+        for (int i = 0; i < data.dialogNodes.Count; i++)
+        {
+            names[i + 1] = !string.IsNullOrEmpty(data.dialogNodes[i].npcName)
+                ? data.dialogNodes[i].npcName
+                : $"Node {i}";
+        }
+        return names;
+    }
+}
 
 public class DialogVisualEditor : EditorWindow
 {
@@ -170,12 +194,13 @@ public class DialogVisualEditor : EditorWindow
 
     private DialogData currentData;
     private Vector2 offset;
-    private Vector2 drag;
     private float zoom = 1f;
 
     private DialogNode selectedNode;
     private DialogNode connectingNode;
     private int connectingOptionIndex = -1;
+
+    private bool isDraggingNode = false;
 
     private const float NODE_WIDTH = 200f;
     private const float NODE_HEADER_HEIGHT = 30f;
@@ -185,8 +210,8 @@ public class DialogVisualEditor : EditorWindow
     private GUIStyle nodeStyle;
     private GUIStyle selectedNodeStyle;
     private GUIStyle entryNodeStyle;
+    private GUIStyle endDialogStyle;
     private GUIStyle optionStyle;
-
 
     [MenuItem("Window/Dialog Visual Editor")]
     public static void OpenWindow()
@@ -221,6 +246,9 @@ public class DialogVisualEditor : EditorWindow
 
         entryNodeStyle = new GUIStyle(nodeStyle);
         entryNodeStyle.normal.background = MakeTexture(2, 2, new Color(0.2f, 0.6f, 0.3f));
+
+        endDialogStyle = new GUIStyle(nodeStyle);
+        endDialogStyle.normal.background = MakeTexture(2, 2, new Color(1f, 0f, 0.2f));
 
         optionStyle = new GUIStyle();
         optionStyle.normal.background = MakeTexture(2, 2, new Color(0.4f, 0.4f, 0.4f));
@@ -290,7 +318,6 @@ public class DialogVisualEditor : EditorWindow
         }
 
         EditorGUILayout.LabelField(currentData != null ? currentData.name : "No Dialog Selected", EditorStyles.toolbarButton);
-
         GUILayout.FlexibleSpace();
 
         if (currentData != null)
@@ -320,6 +347,7 @@ public class DialogVisualEditor : EditorWindow
         int heightDivs = Mathf.CeilToInt(position.height / gridSpacing);
 
         Vector2 gridOffset = new Vector2(offset.x % gridSpacing, offset.y % gridSpacing);
+
         for (int i = 0; i < widthDivs; i++)
         {
             Handles.DrawLine(
@@ -355,11 +383,19 @@ public class DialogVisualEditor : EditorWindow
         float nodeHeight = NODE_HEADER_HEIGHT + (node.options.Count * OPTION_HEIGHT) + 60;
         Rect nodeRect = new Rect(pos.x, pos.y, NODE_WIDTH * zoom, nodeHeight * zoom);
 
-        GUIStyle style = node == selectedNode ? selectedNodeStyle :
-                        (node == currentData.entryNode ? entryNodeStyle : nodeStyle);
+        GUIStyle style;
+        bool isEntryNode = node.nodeID == currentData.entryNodeID;
+
+        if (node == selectedNode)
+            style = selectedNodeStyle;
+        else if (isEntryNode)
+            style = entryNodeStyle;
+        else if (node.IsStartCardGame)
+            style = endDialogStyle;
+        else
+            style = nodeStyle;
 
         GUI.Box(nodeRect, "", style);
-
         GUILayout.BeginArea(nodeRect);
 
         EditorGUILayout.BeginHorizontal();
@@ -373,7 +409,6 @@ public class DialogVisualEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.LabelField(node.dialogText, EditorStyles.wordWrappedLabel);
-
         EditorGUILayout.Space(5);
         EditorGUILayout.LabelField("Options:", EditorStyles.miniBoldLabel);
 
@@ -381,14 +416,13 @@ public class DialogVisualEditor : EditorWindow
         {
             EditorGUILayout.BeginHorizontal(optionStyle);
 
-            string optionLabel = string.IsNullOrEmpty(node.options[i].optionText) ?
-                                $"Option {i + 1}" : node.options[i].optionText;
+            string optionLabel = string.IsNullOrEmpty(node.options[i].optionText)
+                ? $"Option {i + 1}"
+                : node.options[i].optionText;
 
             if (GUILayout.Button(optionLabel, EditorStyles.label))
             {
-                selectedNode = node;
-                Selection.activeObject = currentData;
-                inspectorSelectedNode = node;
+                SelectNodeInInspector(node);
             }
 
             if (GUILayout.Button("→", GUILayout.Width(25)))
@@ -408,7 +442,7 @@ public class DialogVisualEditor : EditorWindow
         if (GUILayout.Button("+ Add Option"))
         {
             Undo.RecordObject(currentData, "Add Dialog Option");
-            node.options.Add(new DialogOption { optionText = "New Option" });
+            node.options.Add(new DialogOption { optionText = "New Option", nextNodeID = "" });
             EditorUtility.SetDirty(currentData);
         }
 
@@ -418,11 +452,27 @@ public class DialogVisualEditor : EditorWindow
         {
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                selectedNode = node;
-                Selection.activeObject = currentData;
-                inspectorSelectedNode = node;
+                SelectNodeInInspector(node);
                 GUI.changed = true;
             }
+        }
+    }
+
+    void SelectNodeInInspector(DialogNode node)
+    {
+        if (selectedNode != node || inspectorSelectedNode != node)
+        {
+            selectedNode = node;
+            inspectorSelectedNode = node;
+
+            // Only change selection if not already focused on this asset
+            if (Selection.activeObject != currentData)
+            {
+                Selection.activeObject = currentData;
+            }
+
+            // Force inspector repaint
+            EditorUtility.SetDirty(currentData);
         }
     }
 
@@ -436,25 +486,24 @@ public class DialogVisualEditor : EditorWindow
         {
             for (int i = 0; i < node.options.Count; i++)
             {
-                if (node.options[i].nextNode != null)
+                if (!string.IsNullOrEmpty(node.options[i].nextNodeID))
                 {
-                    Vector2 start = node.options[i].connectionPoint;
-                    Vector2 end = node.options[i].nextNode.position * zoom + offset + new Vector2(0, NODE_HEADER_HEIGHT * zoom / 2);
+                    DialogNode nextNode = currentData.GetNodeByID(node.options[i].nextNodeID);
+                    if (nextNode != null)
+                    {
+                        Vector2 start = node.options[i].connectionPoint;
+                        Vector2 end = nextNode.position * zoom + offset + new Vector2(0, NODE_HEADER_HEIGHT * zoom / 2);
 
-                    Handles.color = Color.white;
-                    Handles.DrawBezier(
-                        start,
-                        end,
-                        start + Vector2.right * 50,
-                        end + Vector2.left * 50,
-                        Color.white,
-                        null,
-                        2f
-                    );
+                        Handles.color = Color.white;
+                        Handles.DrawBezier(
+                            start, end,
+                            start + Vector2.right * 50,
+                            end + Vector2.left * 50,
+                            Color.white, null, 2f
+                        );
 
-                    Vector2 arrowPos = end;
-                    Vector2 direction = (end - start).normalized;
-                    DrawArrow(arrowPos, direction);
+                        DrawArrow(end, (end - start).normalized);
+                    }
                 }
             }
         }
@@ -464,11 +513,6 @@ public class DialogVisualEditor : EditorWindow
 
     void DrawArrow(Vector2 position, Vector2 direction)
     {
-        if (position == Vector2.zero)
-            return;
-        if (direction == Vector2.zero)
-            return;
-
         Vector2 perpendicular = new Vector2(-direction.y, direction.x);
         Vector2 arrowHead1 = position - direction * 10 + perpendicular * 5;
         Vector2 arrowHead2 = position - direction * 10 - perpendicular * 5;
@@ -488,13 +532,10 @@ public class DialogVisualEditor : EditorWindow
             Vector2 end = Event.current.mousePosition;
 
             Handles.DrawBezier(
-                start,
-                end,
+                start, end,
                 start + Vector2.right * 50,
                 end + Vector2.left * 50,
-                Color.yellow,
-                null,
-                3f
+                Color.yellow, null, 3f
             );
 
             Handles.EndGUI();
@@ -504,8 +545,6 @@ public class DialogVisualEditor : EditorWindow
 
     void ProcessEvents(Event e)
     {
-        drag = Vector2.zero;
-
         switch (e.type)
         {
             case EventType.MouseDown:
@@ -517,12 +556,17 @@ public class DialogVisualEditor : EditorWindow
                         if (targetNode != null && targetNode != connectingNode)
                         {
                             Undo.RecordObject(currentData, "Connect Dialog Nodes");
-                            connectingNode.options[connectingOptionIndex].nextNode = targetNode;
+                            connectingNode.options[connectingOptionIndex].nextNodeID = targetNode.nodeID;
                             EditorUtility.SetDirty(currentData);
                         }
                         connectingNode = null;
                         connectingOptionIndex = -1;
                         e.Use();
+                    }
+                    else if (selectedNode != null)
+                    {
+                        Undo.RecordObject(currentData, "Move Dialog Node");
+                        isDraggingNode = true;
                     }
                 }
                 else if (e.button == 1)
@@ -538,23 +582,28 @@ public class DialogVisualEditor : EditorWindow
                         ShowContextMenu(e.mousePosition);
                     }
                 }
-                else if (e.button == 2)
-                {
-                    // Middle mouse button - start panning
-                }
                 break;
 
             case EventType.MouseDrag:
-                if (e.button == 0 && selectedNode != null)
+                if (e.button == 0 && selectedNode != null && isDraggingNode)
                 {
-                    Undo.RecordObject(currentData, "Move Dialog Node");
                     selectedNode.position += e.delta / zoom;
-                    EditorUtility.SetDirty(currentData);
                     e.Use();
+                    Repaint();
                 }
                 else if (e.button == 2)
                 {
                     offset += e.delta;
+                    e.Use();
+                }
+                break;
+
+            case EventType.MouseUp:
+                if (e.button == 0 && isDraggingNode)
+                {
+                    isDraggingNode = false;
+                    // Only mark dirty after dragging is complete
+                    EditorUtility.SetDirty(currentData);
                     e.Use();
                 }
                 break;
@@ -605,9 +654,17 @@ public class DialogVisualEditor : EditorWindow
                 menu.AddItem(new GUIContent("Set as Entry Node"), false, () =>
                 {
                     Undo.RecordObject(currentData, "Set Entry Node");
-                    currentData.entryNode = clickedNode;
+                    currentData.entryNodeID = clickedNode.nodeID;
                     EditorUtility.SetDirty(currentData);
                 });
+
+                menu.AddItem(new GUIContent("Toggle Start Card Game"), false, () =>
+                {
+                    Undo.RecordObject(currentData, "Toggle Start Card Game");
+                    clickedNode.IsStartCardGame = !clickedNode.IsStartCardGame;
+                    EditorUtility.SetDirty(currentData);
+                });
+
                 menu.AddItem(new GUIContent("Delete Node"), false, () => DeleteNode(clickedNode));
             }
         }
@@ -633,14 +690,14 @@ public class DialogVisualEditor : EditorWindow
             position = position / zoom,
             options = new List<DialogOption>
             {
-                new DialogOption { optionText = "Option 1", nextNode = null }
+                new DialogOption { optionText = "Option 1", nextNodeID = "" }
             }
         };
 
         currentData.dialogNodes.Add(newNode);
 
-        if (currentData.entryNode == null)
-            currentData.entryNode = newNode;
+        if (string.IsNullOrEmpty(currentData.entryNodeID))
+            currentData.entryNodeID = newNode.nodeID;
 
         selectedNode = newNode;
         EditorUtility.SetDirty(currentData);
@@ -652,17 +709,18 @@ public class DialogVisualEditor : EditorWindow
 
         Undo.RecordObject(currentData, "Delete Dialog Node");
 
+        // Remove all references to this node
         foreach (var n in currentData.dialogNodes)
         {
             foreach (var option in n.options)
             {
-                if (option.nextNode == node)
-                    option.nextNode = null;
+                if (option.nextNodeID == node.nodeID)
+                    option.nextNodeID = "";
             }
         }
 
-        if (currentData.entryNode == node)
-            currentData.entryNode = null;
+        if (currentData.entryNodeID == node.nodeID)
+            currentData.entryNodeID = "";
 
         if (inspectorSelectedNode == node)
             inspectorSelectedNode = null;

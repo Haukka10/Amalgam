@@ -55,7 +55,7 @@ namespace CardGame.Manager.Deck
         {
             if (!domainPiles.ContainsKey(domain) || domainPiles[domain].Count == 0)
             {
-                Debug.LogWarning($"Brak kart w kupce domeny {domain}!");
+                Debug.LogWarning($"No more card in {domain}!");
                 return null;
             }
 

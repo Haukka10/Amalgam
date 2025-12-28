@@ -4,15 +4,15 @@ using UnityEngine;
 [System.Serializable]
 public class DialogNode
 {
-    public string nodeID; // Auto-generated
+    public string nodeID; // Auto-generated unique ID
     public string npcName;
     [TextArea(3, 6)]
     public string dialogText;
     public List<DialogOption> options = new List<DialogOption>();
-    public bool IsStartCardGame = false;
 
 #if UNITY_EDITOR
     [HideInInspector] public Vector2 position;
     [HideInInspector] public bool isEntryNode;
+    [HideInInspector] public bool IsStartCardGame = false;
 #endif
 }

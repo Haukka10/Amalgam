@@ -1261,7 +1261,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1579817615}
-  m_Father: {fileID: 629563176}
+  m_Father: {fileID: 2041828943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1666,9 +1666,6 @@ RectTransform:
   m_Children:
   - {fileID: 274785936}
   - {fileID: 2041828943}
-  - {fileID: 677612840}
-  - {fileID: 598315332}
-  - {fileID: 927923802}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2040,7 +2037,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1755253340}
-  m_Father: {fileID: 629563176}
+  m_Father: {fileID: 2041828943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2679,7 +2676,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 629563176}
+  m_Father: {fileID: 2041828943}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2981,7 +2978,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1068147563}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da026741e1ca2054c90ebc1e27cafbe9, type: 3}
   m_Name: 
@@ -3006,6 +3003,7 @@ MonoBehaviour:
   playerDeck: {fileID: 240614485}
   aiDeck: {fileID: 1581590087}
   battlefield: {fileID: 281674301}
+  Board: {fileID: 2041828942}
   moveButton: {fileID: 677612841}
   passButton: {fileID: 598315333}
   turnText: {fileID: 927923803}
@@ -4032,12 +4030,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 69ebf9c6643d8e848949d47ec8ecf3cc, type: 2}
   - {fileID: 11400000, guid: 2d21b66a9adeb5442977e9ef9fd4068d, type: 2}
   domainP_Pile:
-  - {fileID: 11400000, guid: 2d21b66a9adeb5442977e9ef9fd4068d, type: 2}
-  domainM_Pile:
   - {fileID: 11400000, guid: 9d7fb33a0309e2542922dd74e8c38a0a, type: 2}
+  domainM_Pile:
+  - {fileID: 11400000, guid: 2453df6c1adb07d4aaad2d430de2eb4f, type: 2}
   domainD_Pile:
-  - {fileID: 11400000, guid: bfa9cf6f997cb6e42b73e26c75c32bcc, type: 2}
   - {fileID: 11400000, guid: d0705a198f094d241bd49c840aa1197c, type: 2}
+  - {fileID: 11400000, guid: bfa9cf6f997cb6e42b73e26c75c32bcc, type: 2}
   handTransform: {fileID: 540753418}
   cardPrefab: {fileID: 2971449750488496080, guid: 9d822bf132963f540a2f946c3606b631, type: 3}
   pileK_Transform: {fileID: 0}
@@ -5434,7 +5432,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2041828943
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5452,6 +5450,9 @@ RectTransform:
   - {fileID: 281674298}
   - {fileID: 240614484}
   - {fileID: 1581590086}
+  - {fileID: 677612840}
+  - {fileID: 598315332}
+  - {fileID: 927923802}
   m_Father: {fileID: 629563176}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}

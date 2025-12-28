@@ -12,226 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3724c2de3c0348942b024765bcf69aae, type: 3}
   m_Name: NewDialog
   m_EditorClassIdentifier: Assembly-CSharp::DialogData
+  entryNodeID: 97dc893b-1347-4692-b9f0-3b9b1a29cf00
   dialogNodes:
-  - nodeID: ede4f811-9067-4b10-819c-eccb5e920db9
-    npcName: banan
-    dialogText: Enter dialog text here...
-    options:
-    - optionText: Option 1
-      nextNode:
-        nodeID: 4cc25299-6fe2-4409-be44-5c3a29bea35a
-        npcName: NPC
-        dialogText: 1
-        options:
-        - optionText: New Option
-          nextNode:
-            nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-            npcName: NPC
-            dialogText: erdghbsdgsdf
-            options:
-            - optionText: Option 1
-              nextNode:
-                nodeID: 
-                npcName: 
-                dialogText: 
-                options: []
-                position: {x: 0, y: 0}
-                isEntryNode: 0
-              connectionPoint: {x: 1020, y: 300}
-            position: {x: 871, y: 181}
-            isEntryNode: 0
-          connectionPoint: {x: 812, y: 296}
-        position: {x: 557, y: 167}
-        isEntryNode: 0
-      connectionPoint: {x: 391, y: 371}
-    - optionText: New Option
-      nextNode:
-        nodeID: 2a200609-a376-40cc-8059-89d6541efa25
-        npcName: NPC
-        dialogText: 2
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-            npcName: NPC
-            dialogText: erdghbsdgsdf
-            options:
-            - optionText: Option 1
-              nextNode:
-                nodeID: 
-                npcName: 
-                dialogText: 
-                options: []
-                position: {x: 0, y: 0}
-                isEntryNode: 0
-              connectionPoint: {x: 1020, y: 300}
-            position: {x: 871, y: 181}
-            isEntryNode: 0
-          connectionPoint: {x: 701, y: 414}
-        position: {x: 552, y: 295}
-        isEntryNode: 0
-      connectionPoint: {x: 391, y: 396}
-    - optionText: New Option
-      nextNode:
-        nodeID: f2e088aa-5903-4934-b754-38845fedd7a5
-        npcName: NPC
-        dialogText: 3
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 
-            npcName: 
-            dialogText: 
-            options: []
-            position: {x: 0, y: 0}
-            isEntryNode: 0
-          connectionPoint: {x: 747, y: 555}
-        position: {x: 547, y: 453}
-        isEntryNode: 0
-      connectionPoint: {x: 391, y: 421}
-    position: {x: 136, y: 242}
-    isEntryNode: 0
-  - nodeID: 4cc25299-6fe2-4409-be44-5c3a29bea35a
+  - nodeID: 97dc893b-1347-4692-b9f0-3b9b1a29cf00
     npcName: NPC
-    dialogText: 1
+    dialogText: Start
+    options:
+    - optionText: End
+      nextNodeID: 6c60f941-553c-48f7-b0fa-d35f271a56ba
+      connectionPoint: {x: 445, y: 449}
+    - optionText: Card game
+      nextNodeID: a3e68a8f-85c1-404a-9a25-e215cd7e4b0b
+      connectionPoint: {x: 445, y: 474}
+    position: {x: 131, y: 276}
+    isEntryNode: 0
+    IsStartCardGame: 0
+  - nodeID: 6c60f941-553c-48f7-b0fa-d35f271a56ba
+    npcName: NPC
+    dialogText: End
     options:
     - optionText: New Option
-      nextNode:
-        nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-        npcName: NPC
-        dialogText: erdghbsdgsdf
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 
-            npcName: 
-            dialogText: 
-            options: []
-            position: {x: 0, y: 0}
-            isEntryNode: 0
-          connectionPoint: {x: 1020, y: 300}
-        position: {x: 871, y: 181}
-        isEntryNode: 0
-      connectionPoint: {x: 812, y: 296}
-    position: {x: 557, y: 167}
+      nextNodeID: 
+      connectionPoint: {x: 795, y: 403}
+    position: {x: 481, y: 230}
     isEntryNode: 0
-  - nodeID: 2a200609-a376-40cc-8059-89d6541efa25
+    IsStartCardGame: 0
+  - nodeID: a3e68a8f-85c1-404a-9a25-e215cd7e4b0b
     npcName: NPC
-    dialogText: 2
+    dialogText: End Start CARD GAME
     options:
-    - optionText: Option 1
-      nextNode:
-        nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-        npcName: NPC
-        dialogText: erdghbsdgsdf
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 
-            npcName: 
-            dialogText: 
-            options: []
-            position: {x: 0, y: 0}
-            isEntryNode: 0
-          connectionPoint: {x: 1020, y: 300}
-        position: {x: 871, y: 181}
-        isEntryNode: 0
-      connectionPoint: {x: 807, y: 424}
-    position: {x: 552, y: 295}
-    isEntryNode: 0
-  - nodeID: f2e088aa-5903-4934-b754-38845fedd7a5
-    npcName: NPC
-    dialogText: 3
-    options:
-    - optionText: Option 1
-      nextNode:
-        nodeID: 
-        npcName: 
-        dialogText: 
-        options: []
-        position: {x: 0, y: 0}
-        isEntryNode: 0
-      connectionPoint: {x: 802, y: 582}
-    position: {x: 547, y: 453}
-    isEntryNode: 0
-  entryNode:
-    nodeID: ede4f811-9067-4b10-819c-eccb5e920db9
-    npcName: NPC
-    dialogText: Enter dialog text here...
-    options:
-    - optionText: Option 1
-      nextNode:
-        nodeID: 4cc25299-6fe2-4409-be44-5c3a29bea35a
-        npcName: NPC
-        dialogText: 1
-        options:
-        - optionText: New Option
-          nextNode:
-            nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-            npcName: NPC
-            dialogText: erdghbsdgsdf
-            options:
-            - optionText: Option 1
-              nextNode:
-                nodeID: 
-                npcName: 
-                dialogText: 
-                options: []
-                position: {x: 0, y: 0}
-                isEntryNode: 0
-              connectionPoint: {x: 1020, y: 300}
-            position: {x: 871, y: 181}
-            isEntryNode: 0
-          connectionPoint: {x: 706, y: 286}
-        position: {x: 557, y: 167}
-        isEntryNode: 0
-      connectionPoint: {x: 292, y: 414}
     - optionText: New Option
-      nextNode:
-        nodeID: 2a200609-a376-40cc-8059-89d6541efa25
-        npcName: NPC
-        dialogText: 2
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 1b3c40b7-194e-466e-8522-f4bdb38aff26
-            npcName: NPC
-            dialogText: erdghbsdgsdf
-            options:
-            - optionText: Option 1
-              nextNode:
-                nodeID: 
-                npcName: 
-                dialogText: 
-                options: []
-                position: {x: 0, y: 0}
-                isEntryNode: 0
-              connectionPoint: {x: 1020, y: 300}
-            position: {x: 871, y: 181}
-            isEntryNode: 0
-          connectionPoint: {x: 701, y: 414}
-        position: {x: 552, y: 295}
-        isEntryNode: 0
-      connectionPoint: {x: 292, y: 439}
-    - optionText: New Option
-      nextNode:
-        nodeID: f2e088aa-5903-4934-b754-38845fedd7a5
-        npcName: NPC
-        dialogText: 3
-        options:
-        - optionText: Option 1
-          nextNode:
-            nodeID: 
-            npcName: 
-            dialogText: 
-            options: []
-            position: {x: 0, y: 0}
-            isEntryNode: 0
-          connectionPoint: {x: 747, y: 555}
-        position: {x: 547, y: 453}
-        isEntryNode: 0
-      connectionPoint: {x: 292, y: 464}
-    position: {x: 143, y: 295}
+      nextNodeID: 
+      connectionPoint: {x: 802, y: 567}
+    position: {x: 488, y: 394}
     isEntryNode: 0
-  editorOffset: {x: 55, y: 27}
+    IsStartCardGame: 1
+  editorOffset: {x: 114, y: 71}
   editorZoom: 1

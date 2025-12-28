@@ -54,8 +54,8 @@ namespace CardGame.Manager.Main
         [HideInInspector]
         public int currentBilarHP;
 
-        private int turnCount;
-        private Card selectedCard;
+        private int _turnCount;
+        private Card _selectedCard;
         private bool playerTurn = true;
 
         public GameState currentState = GameState.PlayerTurn;
@@ -103,20 +103,20 @@ namespace CardGame.Manager.Main
             if (currentState != GameState.PlayerTurn) return;
             if (card.owner != Player.Human) return;
 
-            selectedCard = card;
+            _selectedCard = card;
 
             if (TypeBattle == TypeBattle.Destroy)
-                selectedCard.SwapEffectivePower();
+                _selectedCard.SwapEffectivePower();
 
             HighlightValidSlots(card);
         }
 
         public void OnSlotClicked(BoardSlot slot)
         {
-            if (selectedCard == null) return;
-            if (!slot.CanPlaceCard(selectedCard)) return;
+            if (_selectedCard == null) return;
+            if (!slot.CanPlaceCard(_selectedCard)) return;
 
-            PlayCardOnSlot(selectedCard, slot);
+            PlayCardOnSlot(_selectedCard, slot);
         }
 
         public void PlayCardOnSlot(Card card, BoardSlot slot)
@@ -132,7 +132,7 @@ namespace CardGame.Manager.Main
             }
 
             ClearHighlights();
-            selectedCard = null;
+            _selectedCard = null;
         }
 
         public void OnDomainPileClicked(CardDomain domain)
@@ -148,18 +148,18 @@ namespace CardGame.Manager.Main
 
         }
 
-        void OnMoveButtonClicked()
+        private void OnMoveButtonClicked()
         {
             playerLane.MoveCardsForward();
             EndPlayerTurn();
         }
 
-        void OnPassButtonClicked()
+        private void OnPassButtonClicked()
         {
             EndPlayerTurn();
         }
 
-        void EndPlayerTurn()
+        private void EndPlayerTurn()
         {
             ProcessTurnEffects();
             currentState = GameState.AITurn;
@@ -168,7 +168,7 @@ namespace CardGame.Manager.Main
             Invoke(nameof(ExecuteAITurn), 1f);
         }
 
-        void ProcessTurnEffects()
+        private void ProcessTurnEffects()
         {
             List<string> keysToProcess = new List<string>();
 
@@ -203,28 +203,19 @@ namespace CardGame.Manager.Main
             BroadcastTurnEndEvent();
         }
 
-        void BroadcastTurnEndEvent()
+        private void BroadcastTurnEndEvent()
         {
             BroadcastToLane(playerLane);
             BroadcastToLane(aiLane);
         }
 
-        void BroadcastToLane(PlayerLane lane)
+        private void BroadcastToLane(PlayerLane lane)
         {
-            if (lane.backSlot.currentCard != null)
-                lane.backSlot.currentCard.TriggerAbility("OnTurnEnd", null);
-
-            if (lane.midSlot.currentCard != null)
-                lane.midSlot.currentCard.TriggerAbility("OnTurnEnd", null);
-
-            if (lane.frontSlot.currentCard != null)
-                lane.frontSlot.currentCard.TriggerAbility("OnTurnEnd", null);
-
-            if (lane.modSlot1.currentCard != null)
-                lane.modSlot1.currentCard.TriggerAbility("OnTurnEnd", null);
-
-            if (lane.modSlot2.currentCard != null)
-                lane.modSlot2.currentCard.TriggerAbility("OnTurnEnd", null);
+            OnTurnEndTrigger(lane.backSlot);
+            OnTurnEndTrigger(lane.modSlot1);
+            OnTurnEndTrigger(lane.midSlot);
+            OnTurnEndTrigger(lane.modSlot2);
+            OnTurnEndTrigger(lane.frontSlot);
 
             if (allCardsFaceDown)
             {
@@ -235,7 +226,16 @@ namespace CardGame.Manager.Main
             }
         }
 
-        void TriggerDelayedEffect(string variableKey)
+        private void OnTurnEndTrigger(BoardSlot slot)
+        {
+            if (slot.currentCard == null)
+                return;
+
+            slot.currentCard.TriggerAbility("OnTurnEnd", slot.currentCard);
+        }
+
+
+        private void TriggerDelayedEffect(string variableKey)
         {
             Debug.Log($"Triggered delayed effect: {variableKey}");
 
@@ -253,19 +253,19 @@ namespace CardGame.Manager.Main
             battlefield.ValhallaSlot.currentCard.TriggerAbility("TriggerDelayedEffect", null);
         }
 
-        void ForcePass()
+        private void ForcePass()
         {
             moveButton.interactable = _FarcePass;
             _FarcePass = !_FarcePass;
         }
 
-        void RevealAllCards()
+        private void RevealAllCards()
         {
             RevealLaneCards(playerLane);
             RevealLaneCards(aiLane);
         }
 
-        void RevealLaneCards(PlayerLane lane)
+        private void RevealLaneCards(PlayerLane lane)
         {
             if (lane.backSlot.currentCard != null)
             {
@@ -283,14 +283,14 @@ namespace CardGame.Manager.Main
             }
         }
 
-        void ExecuteAITurn()
+        private void ExecuteAITurn()
         {
             _AiComp.ExecuteTurn();
 
             CheckForBattle();
         }
 
-        void CheckForBattle()
+        private void CheckForBattle()
         {
             if (playerLane.HasCardOnFront() && aiLane.HasCardOnFront())
             {
@@ -349,7 +349,7 @@ namespace CardGame.Manager.Main
             }
         }
 
-        void UpdateUI()
+        private void UpdateUI()
         {
             turnText.text = currentState == GameState.PlayerTurn ? "Your turn" : "Enemy turn";
             moveButton.interactable = currentState == GameState.PlayerTurn;
